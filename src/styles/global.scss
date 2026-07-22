@@ -87,6 +87,30 @@ select:focus-visible {
   animation: breathe 1.8s ease-in-out infinite;
 }
 
+.error-screen {
+  min-height: 100svh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  padding: 24px;
+  text-align: center;
+
+  img { width: 52px; margin-bottom: 18px; }
+  h1 { margin: 0 0 5px; }
+  p { max-width: 460px; color: var(--muted); }
+  button { min-height: 43px; border: 0; border-radius: 12px; padding: 0 16px; background: var(--green); color: white; font-weight: 800; cursor: pointer; }
+}
+
+.app-alert {
+  margin: 0 0 16px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: #fbe2dc;
+  color: #8e382a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 @keyframes breathe {
   50% { transform: translateY(-5px) rotate(-2deg); }
 }

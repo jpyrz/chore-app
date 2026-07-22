@@ -1,0 +1,225 @@
+.page {
+  min-height: 100svh;
+  display: grid;
+  background: var(--paper);
+}
+
+.story {
+  min-height: 310px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  background: var(--green);
+  color: white;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    border: 28px solid rgba(245, 200, 93, 0.17);
+    border-radius: 50%;
+  }
+
+  &::before { width: 190px; height: 190px; right: -85px; top: 40px; }
+  &::after { width: 100px; height: 100px; right: 40px; bottom: -75px; }
+}
+
+.brand {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+
+  img { width: 36px; height: 36px; border-radius: 11px; }
+}
+
+.storyCopy {
+  position: relative;
+  z-index: 1;
+  margin: auto 0 28px;
+
+  h1 { margin: 8px 0; font-size: clamp(38px, 12vw, 62px); line-height: 0.95; letter-spacing: -2px; }
+  p { max-width: 440px; margin: 0; color: #cfe1da; font-size: 14px; line-height: 1.55; }
+}
+
+.eyebrow {
+  color: var(--yellow);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.exampleJob {
+  display: none;
+}
+
+.formSide {
+  display: grid;
+  place-items: center;
+  padding: 34px 22px;
+  background: var(--paper);
+}
+
+.formCard {
+  width: min(100%, 430px);
+
+  > .eyebrow { color: var(--green-bright); }
+  h2 { margin: 7px 0 5px; font-size: 31px; line-height: 1.05; letter-spacing: -0.8px; }
+}
+
+.intro { margin: 0 0 25px; color: var(--muted); font-size: 13px; }
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.formCard form {
+  display: grid;
+  gap: 15px;
+
+  > label {
+    display: grid;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  input {
+    width: 100%;
+    height: 50px;
+    border: 1px solid #d7d3c7;
+    border-radius: 14px;
+    background: #fff;
+    padding: 0 14px;
+    color: var(--ink);
+    font-size: 15px;
+  }
+}
+
+.inputWithIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  > svg { position: absolute; left: 14px; color: #87918b; pointer-events: none; }
+  > svg + input { padding-left: 43px; }
+  > button {
+    position: absolute;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    color: #7d8781;
+    cursor: pointer;
+  }
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+
+  button {
+    border: 0;
+    background: transparent;
+    color: var(--green-bright);
+    padding: 0;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+.submit {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 15px;
+  background: var(--green);
+  color: white;
+  font-weight: 800;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+
+  &:disabled { opacity: 0.65; cursor: wait; }
+}
+
+.error,
+.message {
+  margin: 0;
+  padding: 11px 13px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.error { background: #fbe2dc; color: #8e382a; }
+.message { background: #ddefd9; color: #32623c; }
+
+.switchMode {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin: 22px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+
+  button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--green-bright);
+    font-weight: 800;
+    cursor: pointer;
+  }
+}
+
+@media (min-width: 820px) {
+  .page { grid-template-columns: minmax(360px, 0.9fr) minmax(460px, 1.1fr); }
+  .story { min-height: 100svh; padding: 38px clamp(32px, 5vw, 70px); }
+  .storyCopy { margin: auto 0 45px; }
+  .exampleJob {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    max-width: 430px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.11);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 18px;
+    backdrop-filter: blur(10px);
+
+    .check { width: 42px; height: 42px; display: grid; place-items: center; background: var(--yellow); color: #76520a; border-radius: 14px; }
+    strong, small { display: block; }
+    strong { font-size: 13px; }
+    small { color: #cfe1da; font-size: 10px; margin-top: 3px; }
+    b { color: var(--yellow); font-family: 'Nunito', sans-serif; }
+  }
+  .formSide { padding: 50px; }
+}

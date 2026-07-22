@@ -118,6 +118,98 @@
   border-radius: 50%;
 }
 
+.crewList {
+  margin-top: 6px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+
+  > span {
+    display: block;
+    padding: 4px 8px 7px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  > button {
+    width: 100%;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: 11px;
+    background: transparent;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .activeCrew { background: #edf3ef; color: var(--green); font-weight: 800; }
+}
+
+.switcher > .signOut {
+  min-height: 42px;
+  display: flex;
+  grid-template-columns: auto 1fr;
+  margin-top: 6px;
+  padding: 0 10px;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 12px 12px;
+  color: #8e382a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pinBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(12, 30, 25, 0.5);
+  backdrop-filter: blur(5px);
+}
+
+.pinModal {
+  width: min(100%, 370px);
+  position: relative;
+  padding: 28px;
+  background: var(--paper);
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 30px 90px rgba(13, 31, 26, 0.3);
+
+  h2 { margin: 12px 0 3px; font-size: 26px; }
+  > p { margin: 0 0 20px; color: var(--muted); font-size: 12px; }
+
+  form { display: grid; gap: 12px; text-align: left; }
+  label { display: grid; gap: 7px; font-size: 11px; font-weight: 800; }
+  input { height: 54px; border: 1px solid #d7d3c7; border-radius: 14px; text-align: center; font-size: 22px; letter-spacing: 0.45em; }
+  form > button { min-height: 48px; border: 0; border-radius: 13px; background: var(--green); color: white; font-weight: 800; cursor: pointer; }
+  form > button:disabled { opacity: 0.55; }
+}
+
+.pinClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: #efede5;
+  cursor: pointer;
+}
+
+.pinIcon { width: 48px; height: 48px; display: inline-grid; place-items: center; border-radius: 15px; background: #fff0c9; color: #825b00; }
+.pinError { margin: 0; color: #8e382a; font-size: 11px; }
+
 .main {
   width: min(100% - 32px, 980px);
   margin: 0 auto;

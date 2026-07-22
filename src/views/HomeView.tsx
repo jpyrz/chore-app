@@ -35,6 +35,8 @@ export function HomeView({
     (chore) => chore.assigneeId === activeMember.id && chore.status === 'review',
   )
   const review = snapshot.chores.filter((chore) => chore.status === 'review')
+  const latestEarning = snapshot.ledger.find((entry) => entry.kind === 'earning')
+  const latestEarner = snapshot.members.find((member) => member.id === latestEarning?.memberId)
   const balance = getBalance(snapshot.ledger, activeMember.id)
   const goal = snapshot.goals[activeMember.id]
   const progress = Math.min(100, Math.max(0, (balance / goal.targetCents) * 100))
@@ -51,9 +53,11 @@ export function HomeView({
         <div className={styles.greeting}>
           <p>{greeting},</p>
           <h1>{activeMember.name}!</h1>
-          <span className={styles.streak}>
-            <Flame size={16} fill="currentColor" /> {activeMember.streak} day rhythm
-          </span>
+          {activeMember.streak > 0 && (
+            <span className={styles.streak}>
+              <Flame size={16} fill="currentColor" /> {activeMember.streak} day rhythm
+            </span>
+          )}
         </div>
 
         <Link to="/earnings" className={styles.balanceCard}>
@@ -142,6 +146,7 @@ export function HomeView({
           {available.map((chore) => (
             <ChoreCard key={chore.id} chore={chore} mode="available" onAction={() => onClaim(chore.id)} />
           ))}
+          {available.length === 0 && <p className={styles.emptyLine}>Nothing is waiting right now. Nice work.</p>}
         </div>
       </section>
 
@@ -152,12 +157,14 @@ export function HomeView({
             <h2>Good work travels</h2>
           </div>
         </div>
-        <div className={styles.buzzItem}>
-          <div className={styles.avatarStack}>
-            {snapshot.members.slice(1).map((member) => <Avatar key={member.id} member={member} size="small" />)}
+        {latestEarning && latestEarner ? (
+          <div className={styles.buzzItem}>
+            <div className={styles.avatarStack}><Avatar member={latestEarner} size="small" /></div>
+            <p><strong>{latestEarner.name}</strong> earned {formatMoney(latestEarning.amountCents)} for {latestEarning.description.toLowerCase()}.</p>
           </div>
-          <p><strong>Sam</strong> finished the counters. That makes 7 jobs done by the crew this week.</p>
-        </div>
+        ) : (
+          <p className={styles.emptyBuzz}>The first finished job will show up here.</p>
+        )}
       </section>
 
       {addingChore && <AddChoreModal onClose={() => setAddingChore(false)} onAdd={onAddChore} />}

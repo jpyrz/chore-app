@@ -35,6 +35,7 @@
 - Treat `ledger_entries` as append-only. An approved occurrence creates at most one earning through an idempotent database procedure.
 - Claiming and approval must remain atomic. Never implement balance changes as client-composed table writes.
 - Managed profiles may omit `auth_user_id`; their authenticated manager is responsible for actions performed on their behalf.
+- A managed-profile PIN is a shared-device convenience gate, not a separate Supabase identity. Persist child mode across refreshes and require account reauthentication before restoring parent controls.
 
 ## Delivery
 

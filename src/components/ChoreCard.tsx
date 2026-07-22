@@ -29,7 +29,7 @@ export function ChoreCard({ chore, mode, memberName, onAction }: ChoreCardProps)
         <strong className={styles.reward}>{formatMoney(chore.rewardCents)}</strong>
       </div>
 
-      {chore.instructions && mode === 'mine' && (
+      {chore.instructions && (
         <p className={styles.instructions}>{chore.instructions}</p>
       )}
 

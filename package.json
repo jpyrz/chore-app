@@ -37,6 +37,7 @@
     "cypress": "^15.19.0",
     "jsdom": "^29.1.1",
     "oxlint": "^1.71.0",
+    "supabase": "^2.109.1",
     "typescript": "~6.0.2",
     "vite": "^8.1.1",
     "vitest": "^4.1.10"

@@ -17,6 +17,7 @@ export interface Member {
   role: MemberRole
   color: string
   streak: number
+  managedBy?: string
 }
 
 export interface Chore {
@@ -53,10 +54,42 @@ export interface CrewSnapshot {
   goals: Record<string, { name: string; targetCents: number }>
 }
 
+export interface AccountProfile {
+  id: string
+  name: string
+  initials: string
+  color: string
+}
+
+export interface CrewMembershipSummary {
+  crewId: string
+  crewName: string
+  inviteCode: string
+  role: MemberRole
+}
+
+export interface AccountContext {
+  profile: AccountProfile
+  memberships: CrewMembershipSummary[]
+}
+
 export interface NewChoreInput {
   title: string
   category: ChoreCategory
   rewardCents: number
   timing: string
   cadence: string
+  instructions?: string
+}
+
+export interface ManagedProfileInput {
+  name: string
+  pin: string
+  color: string
+}
+
+export interface PayoutInput {
+  memberId: string
+  amountCents: number
+  description: string
 }

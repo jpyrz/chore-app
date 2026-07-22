@@ -6,14 +6,17 @@ Choreline is a mobile-first shared job board for families and other small crews.
 
 ## Current build
 
-The app currently runs as an interactive product demo backed by local browser storage. Use the profile switcher in the top-right to move between Mia’s member experience and James’s manager experience:
+Choreline now uses real Supabase accounts and persistent Crew data. The launch workflow includes:
 
-1. Claim an available job as Mia.
-2. Mark it finished.
-3. Switch to James and approve it.
-4. Switch back to Mia to see the updated balance and ledger.
+- Email/password signup, confirmation, sign-in, sign-out, and password recovery.
+- Create a Crew or join one with an invite code.
+- Owner, manager, and member roles.
+- Parent-managed profiles with PIN entry and password-protected return to parent mode.
+- One-time, daily, weekday, and weekly jobs.
+- Claim, finish, approve, and append-only earnings ledger flows.
+- Savings goals and cash/external-payment recording.
 
-The Supabase client boundary and production schema migration are included, but the UI intentionally stays on the local demo repository until a hosted Supabase project is linked.
+There is no payment processor: Choreline records what was earned and what a manager paid outside the app.
 
 ## Setup
 
@@ -52,14 +55,15 @@ npm run cy:run
 
 Schema history lives in `supabase/migrations`. The initial migration includes Crew roles, managed profiles, recurring job templates, job occurrences, append-only ledger entries, RLS policies, and atomic functions for claiming, completing, approving, and recording payouts.
 
-Apply the migration only after linking the intended Supabase project and reviewing the target:
+The schema includes RLS, trusted mutation functions, managed-profile PIN attempt limits, recurring occurrence generation, and an append-only ledger. Link only the intended project, then apply and test the migrations:
 
 ```bash
-supabase link --project-ref YOUR_PROJECT_REF
-supabase migration list
-supabase db push
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase migration list
+npx supabase db push
+npx supabase test db
 ```
 
 ## Hosting
 
-`netlify.toml` configures the Vite build, immutable asset caching, and the React Router SPA fallback. Production deployment is intentionally not connected yet.
+`netlify.toml` configures the Vite build, immutable asset caching, and the React Router SPA fallback. Set both public Supabase environment variables in Netlify before deploying.

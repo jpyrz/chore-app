@@ -13,6 +13,7 @@ export function AddChoreModal({ onClose, onAdd }: AddChoreModalProps) {
   const [reward, setReward] = useState('2.00')
   const [category, setCategory] = useState<ChoreCategory>('tidy')
   const [cadence, setCadence] = useState('One time')
+  const [instructions, setInstructions] = useState('')
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
@@ -24,6 +25,7 @@ export function AddChoreModal({ onClose, onAdd }: AddChoreModalProps) {
       category,
       cadence,
       timing: 'Anytime today',
+      instructions: instructions.trim() || undefined,
     })
     onClose()
   }
@@ -79,6 +81,15 @@ export function AddChoreModal({ onClose, onAdd }: AddChoreModalProps) {
               <option value="laundry">Laundry</option>
               <option value="other">Other</option>
             </select>
+          </label>
+          <label>
+            Helpful details <small>Optional</small>
+            <textarea
+              value={instructions}
+              onChange={(event) => setInstructions(event.target.value)}
+              placeholder="Put clean towels in the hall closet…"
+              maxLength={500}
+            />
           </label>
           <button type="submit" className={styles.submit}>Add to the line</button>
         </form>

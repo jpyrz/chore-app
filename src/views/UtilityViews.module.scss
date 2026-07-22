@@ -1,0 +1,69 @@
+.utilityPage {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(245, 200, 93, 0.22), transparent 26%),
+    var(--cream);
+}
+
+.utilityCard {
+  width: min(100%, 500px);
+  padding: clamp(24px, 6vw, 42px);
+  background: var(--paper);
+  border: 1px solid rgba(23, 50, 43, 0.09);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+
+  > img { width: 48px; height: 48px; border-radius: 14px; margin-bottom: 28px; }
+  h1 { margin: 6px 0 8px; font-size: clamp(30px, 8vw, 42px); line-height: 1.02; letter-spacing: -1.2px; }
+  > p { color: var(--muted); font-size: 14px; line-height: 1.55; }
+}
+
+.eyebrow { color: var(--green-bright); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.11em; }
+
+.requirements {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0;
+
+  > div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px;
+    background: #edf3ef;
+    border-radius: 15px;
+    color: var(--green);
+  }
+
+  span { min-width: 0; }
+  strong, small { display: block; }
+  strong { font-size: 12px; }
+  small { margin-top: 2px; color: var(--muted); font-family: ui-monospace, monospace; font-size: 10px; }
+}
+
+.hint {
+  margin-bottom: 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: 12px !important;
+
+  code { color: var(--ink); background: #efede5; border-radius: 5px; padding: 2px 5px; }
+}
+
+.utilityForm {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+
+  label { display: grid; gap: 7px; font-size: 12px; font-weight: 800; }
+  input { height: 49px; border: 1px solid #d7d3c7; border-radius: 13px; padding: 0 13px; background: white; }
+  button,
+  .primaryLink { min-height: 50px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 14px; background: var(--green); color: white; font-weight: 800; cursor: pointer; }
+}
+
+.error { margin: 0; color: #8e382a !important; font-size: 12px !important; }
+.successIcon { color: var(--green-bright); margin-bottom: 5px; }
+.primaryLink { margin-top: 24px; }
