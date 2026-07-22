@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 import type {
   AccountContext,
+  AppNotification,
   Chore,
   ChoreCategory,
   CrewMembershipSummary,
@@ -62,6 +63,15 @@ interface LedgerRow {
   kind: 'earning' | 'payout' | 'adjustment'
   amount_cents: number
   description: string
+  created_at: string
+}
+
+interface NotificationRow {
+  id: string
+  kind: 'approval_needed' | 'new_job' | 'payout_recorded'
+  title: string
+  body: string
+  read_at: string | null
   created_at: string
 }
 
@@ -203,6 +213,42 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
     ledger,
     goals,
   }
+}
+
+export async function getNotifications(crewId: string, memberId: string): Promise<AppNotification[]> {
+  const { data, error } = await client()
+    .from('notifications')
+    .select('id, kind, title, body, read_at, created_at')
+    .eq('crew_id', crewId)
+    .eq('recipient_id', memberId)
+    .order('created_at', { ascending: false })
+    .limit(30)
+
+  if (error) throw new Error(error.message)
+  return ((data ?? []) as NotificationRow[]).map((notification) => ({
+    id: notification.id,
+    kind: notification.kind,
+    title: notification.title,
+    body: notification.body,
+    read: Boolean(notification.read_at),
+    createdAt: notification.created_at,
+  }))
+}
+
+export async function markNotificationRead(notificationId: string, memberId: string) {
+  const { error } = await client().rpc('mark_notification_read', {
+    p_notification_id: notificationId,
+    p_member_id: memberId,
+  })
+  if (error) throw new Error(error.message)
+}
+
+export async function markAllNotificationsRead(crewId: string, memberId: string) {
+  const { error } = await client().rpc('mark_all_notifications_read', {
+    p_crew_id: crewId,
+    p_member_id: memberId,
+  })
+  if (error) throw new Error(error.message)
 }
 
 export async function createCrew(name: string) {

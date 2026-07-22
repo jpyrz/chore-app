@@ -89,6 +89,7 @@ function SignedInApp({ authUserId }: { authUserId: string }) {
       activeMember={activeMember}
       currentProfileId={currentProfileId}
       memberships={account.data.memberships}
+      notifications={crew.notifications}
       onSelectCrew={switchCrew}
       onSelectMember={async (memberId, pin) => {
         if (memberId === currentProfileId && activeMember.id !== currentProfileId) {
@@ -101,6 +102,8 @@ function SignedInApp({ authUserId }: { authUserId: string }) {
         selectMember(memberId)
         return true
       }}
+      onMarkNotificationRead={crew.markNotificationRead}
+      onMarkAllNotificationsRead={crew.markAllNotificationsRead}
       onSignOut={auth.signOut}
     >
       {crew.mutationError && <div className="app-alert" role="alert">{crew.mutationError.message}</div>}

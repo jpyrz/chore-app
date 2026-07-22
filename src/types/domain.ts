@@ -41,6 +41,17 @@ export interface LedgerEntry {
   createdAt: string
 }
 
+export type NotificationKind = 'approval_needed' | 'new_job' | 'payout_recorded'
+
+export interface AppNotification {
+  id: string
+  kind: NotificationKind
+  title: string
+  body: string
+  read: boolean
+  createdAt: string
+}
+
 export interface CrewSnapshot {
   crew: {
     id: string

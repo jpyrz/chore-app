@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = extensions, public;
 
-select plan(11);
+select plan(22);
 
 select ok(
   (select relrowsecurity from pg_class where oid = 'public.ledger_entries'::regclass),
@@ -58,6 +58,80 @@ select ok(
       and indexname = 'chore_occurrences_template_period_idx'
   ),
   'recurring jobs have a unique period guard'
+);
+select ok(
+  (select relrowsecurity from pg_class where oid = 'public.notifications'::regclass),
+  'notifications have row-level security enabled'
+);
+select ok(
+  not has_table_privilege('authenticated', 'public.notifications', 'INSERT'),
+  'browser users cannot forge notifications'
+);
+select ok(
+  not has_table_privilege('authenticated', 'public.notifications', 'UPDATE'),
+  'browser users cannot rewrite notifications directly'
+);
+select ok(
+  has_table_privilege('authenticated', 'public.notifications', 'SELECT'),
+  'authenticated profiles can read notifications through RLS'
+);
+select ok(
+  has_function_privilege('authenticated', 'public.mark_notification_read(uuid,uuid)', 'EXECUTE'),
+  'authenticated profiles can call the checked read function'
+);
+select ok(
+  has_function_privilege('authenticated', 'public.mark_all_notifications_read(uuid,uuid)', 'EXECUTE'),
+  'authenticated profiles can call the checked mark-all-read function'
+);
+select ok(
+  exists (
+    select 1 from pg_trigger
+    where tgrelid = 'public.chore_occurrences'::regclass
+      and tgname = 'chore_occurrence_notify_new_job'
+      and not tgisinternal
+  ),
+  'new jobs create notifications'
+);
+select ok(
+  exists (
+    select 1 from pg_trigger
+    where tgrelid = 'public.chore_occurrences'::regclass
+      and tgname = 'chore_occurrence_notify_approval'
+      and not tgisinternal
+  ),
+  'completed jobs notify managers for approval'
+);
+select ok(
+  exists (
+    select 1 from pg_trigger
+    where tgrelid = 'public.chore_occurrences'::regclass
+      and tgname = 'chore_occurrence_resolve_notifications'
+      and not tgisinternal
+  ),
+  'claimed and approved jobs resolve stale notifications'
+);
+select ok(
+  exists (
+    select 1 from pg_trigger
+    where tgrelid = 'public.ledger_entries'::regclass
+      and tgname = 'ledger_entry_notify_payout'
+      and not tgisinternal
+  ),
+  'payout ledger entries notify their recipients'
+);
+select is(
+  (
+    select count(*)::integer
+    from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename in (
+        'crews', 'crew_members', 'chore_templates', 'chore_occurrences',
+        'ledger_entries', 'savings_goals', 'notifications'
+      )
+  ),
+  7,
+  'Crew activity tables are published to Supabase Realtime'
 );
 
 select * from finish();

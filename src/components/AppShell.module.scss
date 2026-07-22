@@ -41,6 +41,12 @@
   cursor: pointer;
 }
 
+.topbarActions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .profileText {
   display: none;
   text-align: right;

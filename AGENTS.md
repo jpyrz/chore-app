@@ -11,7 +11,7 @@
 
 - Client: React, Vite, TypeScript, React Router, TanStack Query.
 - Styling: SCSS Modules with warm paper surfaces, tactile controls, rounded geometry, and the shared tokens in `src/styles/global.scss`.
-- Backend: Supabase Auth and Postgres. Realtime is not currently used.
+- Backend: Supabase Auth and Postgres. Supabase Realtime invalidates Crew and notification queries across active devices.
 - Hosting: Netlify from GitHub `main`.
 - PWA: Yes. Cache the app shell and immutable static assets only; authentication and data operations remain network-bound.
 
@@ -36,6 +36,7 @@
 - Claiming and approval must remain atomic. Never implement balance changes as client-composed table writes.
 - Managed profiles may omit `auth_user_id`; their authenticated manager is responsible for actions performed on their behalf.
 - A managed-profile PIN is a shared-device convenience gate, not a separate Supabase identity. Persist child mode across refreshes and require account reauthentication before restoring parent controls.
+- Notifications are database-generated, profile-scoped, protected by RLS, and marked read only through trusted procedures.
 
 ## Delivery
 

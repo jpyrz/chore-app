@@ -10,8 +10,9 @@ import {
 } from 'lucide-react'
 import { useState, type FormEvent, type PropsWithChildren } from 'react'
 import { NavLink } from 'react-router'
-import type { CrewMembershipSummary, CrewSnapshot, Member } from '../types/domain'
+import type { AppNotification, CrewMembershipSummary, CrewSnapshot, Member } from '../types/domain'
 import { Avatar } from './Avatar'
+import { NotificationCenter } from './NotificationCenter'
 import styles from './AppShell.module.scss'
 
 interface AppShellProps extends PropsWithChildren {
@@ -19,8 +20,11 @@ interface AppShellProps extends PropsWithChildren {
   activeMember: Member
   currentProfileId: string
   memberships: CrewMembershipSummary[]
+  notifications: AppNotification[]
   onSelectCrew: (crewId: string) => void
   onSelectMember: (memberId: string, pin?: string) => Promise<boolean>
+  onMarkNotificationRead: (notificationId: string) => Promise<unknown>
+  onMarkAllNotificationsRead: () => Promise<unknown>
   onSignOut: () => Promise<void>
 }
 
@@ -36,12 +40,16 @@ export function AppShell({
   activeMember,
   currentProfileId,
   memberships,
+  notifications,
   onSelectCrew,
   onSelectMember,
+  onMarkNotificationRead,
+  onMarkAllNotificationsRead,
   onSignOut,
   children,
 }: AppShellProps) {
   const [profileOpen, setProfileOpen] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [pinMember, setPinMember] = useState<Member | null>(null)
   const [pin, setPin] = useState('')
   const [pinError, setPinError] = useState('')
@@ -89,20 +97,36 @@ export function AppShell({
           <span>choreline</span>
         </NavLink>
 
-        <button
-          className={styles.profileButton}
-          onClick={() => setProfileOpen((value) => !value)}
-          aria-expanded={profileOpen}
-          aria-haspopup="dialog"
-          aria-label={`Switch profile. Currently viewing as ${activeMember.name}`}
-        >
-          <span className={styles.profileText}>
-            <strong>{activeMember.name}</strong>
-            <small>{snapshot.crew.name}</small>
-          </span>
-          <Avatar member={activeMember} size="small" />
-          <ChevronDown size={16} aria-hidden="true" />
-        </button>
+        <div className={styles.topbarActions}>
+          <NotificationCenter
+            notifications={notifications}
+            open={notificationsOpen}
+            onToggle={() => {
+              setNotificationsOpen((value) => !value)
+              setProfileOpen(false)
+            }}
+            onClose={() => setNotificationsOpen(false)}
+            onMarkRead={onMarkNotificationRead}
+            onMarkAllRead={onMarkAllNotificationsRead}
+          />
+          <button
+            className={styles.profileButton}
+            onClick={() => {
+              setProfileOpen((value) => !value)
+              setNotificationsOpen(false)
+            }}
+            aria-expanded={profileOpen}
+            aria-haspopup="dialog"
+            aria-label={`Switch profile. Currently viewing as ${activeMember.name}`}
+          >
+            <span className={styles.profileText}>
+              <strong>{activeMember.name}</strong>
+              <small>{snapshot.crew.name}</small>
+            </span>
+            <Avatar member={activeMember} size="small" />
+            <ChevronDown size={16} aria-hidden="true" />
+          </button>
+        </div>
       </header>
 
       {profileOpen && (
