@@ -8,6 +8,7 @@ describe('AuthView', () => {
     mount(<QueryClientProvider client={queryClient}><AuthView /></QueryClientProvider>)
 
     cy.contains('Ready when you are.').should('be.visible')
+    cy.get('input[type="email"]').should('have.css', 'font-size', '16px')
     cy.contains('button', 'Create an account').click()
     cy.contains('Make good work visible.').should('be.visible')
     cy.contains('label', 'Your name').should('be.visible')

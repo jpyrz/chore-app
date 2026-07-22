@@ -335,7 +335,7 @@
   > p { color: var(--muted); margin: 0 0 20px; font-size: 12px; }
   form { display: grid; gap: 13px; }
   label { display: grid; gap: 7px; font-size: 11px; font-weight: 800; }
-  input, select { width: 100%; height: 48px; border: 1px solid #d7d3c7; border-radius: 13px; background: white; padding: 0 13px; }
+  input, select { width: 100%; height: 48px; border: 1px solid #d7d3c7; border-radius: 13px; background: white; padding: 0 13px; font-size: 16px; }
   form > button { min-height: 49px; border: 0; border-radius: 13px; background: var(--green); color: white; font-weight: 800; cursor: pointer; }
 }
 
@@ -515,7 +515,7 @@
   border-top: 1px solid #e8e4da;
 
   label { flex: 1; display: grid; gap: 4px; color: var(--muted); font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
-  select { width: 100%; height: 36px; padding: 0 8px; border: 1px solid #d7d3c7; border-radius: 10px; background: white; color: var(--ink); text-transform: capitalize; }
+  select { width: 100%; height: 36px; padding: 0 8px; border: 1px solid #d7d3c7; border-radius: 10px; background: white; color: var(--ink); font-size: 16px; text-transform: capitalize; }
   button { height: 36px; padding: 0 10px; border: 1px solid #e0bcb5; border-radius: 10px; background: #fbe2dc; color: #8e382a; font-size: 10px; font-weight: 800; cursor: pointer; }
 }
 

@@ -238,6 +238,11 @@ export async function claimRealChore(choreId: string, memberId: string) {
   if (error) throw new Error(error.message)
 }
 
+export async function unclaimRealChore(choreId: string, memberId: string) {
+  const { error } = await client().rpc('unclaim_chore', { p_occurrence_id: choreId, p_member_id: memberId })
+  if (error) throw new Error(error.message)
+}
+
 export async function completeRealChore(choreId: string, memberId: string) {
   const { error } = await client().rpc('complete_chore', { p_occurrence_id: choreId, p_member_id: memberId })
   if (error) throw new Error(error.message)

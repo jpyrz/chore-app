@@ -112,6 +112,7 @@ function SignedInApp({ authUserId }: { authUserId: string }) {
               snapshot={crew.data}
               activeMember={activeMember}
               onClaim={crew.claimChore}
+              onUnclaim={crew.unclaimChore}
               onComplete={crew.completeChore}
               onApprove={crew.approveChore}
               onAddChore={crew.addChore}

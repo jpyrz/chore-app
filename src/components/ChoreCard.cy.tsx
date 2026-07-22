@@ -27,4 +27,31 @@ describe('ChoreCard', () => {
     cy.contains('button', 'I’ll do it').click()
     cy.get('@claim').should('have.been.calledOnce')
   })
+
+  it('lets the assigned member return a claimed job', () => {
+    const onFinish = cy.stub().as('finish')
+    const onUnclaim = cy.stub().as('unclaim')
+
+    mount(
+      <ChoreCard
+        chore={{
+          id: 'claimed-job',
+          title: 'Put away laundry',
+          category: 'laundry',
+          rewardCents: 300,
+          timing: 'Today',
+          cadence: 'Daily',
+          status: 'claimed',
+          assigneeId: 'member-1',
+        }}
+        mode="mine"
+        onAction={onFinish}
+        onSecondaryAction={onUnclaim}
+      />,
+    )
+
+    cy.contains('button', 'Unclaim').click()
+    cy.get('@unclaim').should('have.been.calledOnce')
+    cy.get('@finish').should('not.have.been.called')
+  })
 })

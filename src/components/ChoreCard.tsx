@@ -1,4 +1,4 @@
-import { Check, Clock3 } from 'lucide-react'
+import { Check, Clock3, Undo2 } from 'lucide-react'
 import type { Chore } from '../types/domain'
 import { formatMoney } from '../utils/money'
 import { CategoryIcon } from './CategoryIcon'
@@ -9,9 +9,10 @@ interface ChoreCardProps {
   mode: 'available' | 'mine' | 'review'
   memberName?: string
   onAction: () => void
+  onSecondaryAction?: () => void
 }
 
-export function ChoreCard({ chore, mode, memberName, onAction }: ChoreCardProps) {
+export function ChoreCard({ chore, mode, memberName, onAction, onSecondaryAction }: ChoreCardProps) {
   const actionLabel = mode === 'available' ? 'I’ll do it' : mode === 'mine' ? 'Mark finished' : 'Approve'
 
   return (
@@ -35,10 +36,18 @@ export function ChoreCard({ chore, mode, memberName, onAction }: ChoreCardProps)
 
       <div className={styles.choreFooter}>
         <span>{chore.cadence}</span>
-        <button className={mode === 'available' ? styles.secondaryAction : styles.primaryAction} onClick={onAction}>
-          {mode !== 'available' && <Check size={16} aria-hidden="true" />}
-          {actionLabel}
-        </button>
+        <div className={styles.choreActions}>
+          {mode === 'mine' && onSecondaryAction && (
+            <button className={styles.unclaimAction} onClick={onSecondaryAction}>
+              <Undo2 size={15} aria-hidden="true" />
+              Unclaim
+            </button>
+          )}
+          <button className={mode === 'available' ? styles.secondaryAction : styles.primaryAction} onClick={onAction}>
+            {mode !== 'available' && <Check size={16} aria-hidden="true" />}
+            {actionLabel}
+          </button>
+        </div>
       </div>
     </article>
   )

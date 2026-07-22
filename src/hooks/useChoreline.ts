@@ -12,6 +12,7 @@ import {
   recordRealPayout,
   removeRealMember,
   setSavingsGoal,
+  unclaimRealChore,
   updateRealMemberRole,
   verifyManagedProfilePin,
 } from '../api/chorelineRepository'
@@ -59,6 +60,7 @@ export function useRealCrew(crewId: string | undefined, activeMemberId: string |
   })
 
   const claim = useCrewMutation<string>(queryKey, (choreId) => claimRealChore(choreId, activeMemberId!))
+  const unclaim = useCrewMutation<string>(queryKey, (choreId) => unclaimRealChore(choreId, activeMemberId!))
   const complete = useCrewMutation<string>(queryKey, (choreId) => completeRealChore(choreId, activeMemberId!))
   const approve = useCrewMutation<string>(queryKey, approveRealChore)
   const add = useCrewMutation<NewChoreInput>(queryKey, (input) => createRealChore(crewId!, input))
@@ -75,6 +77,7 @@ export function useRealCrew(crewId: string | undefined, activeMemberId: string |
   return {
     ...query,
     claimChore: claim.mutateAsync,
+    unclaimChore: unclaim.mutateAsync,
     completeChore: complete.mutateAsync,
     approveChore: approve.mutateAsync,
     addChore: add.mutateAsync,
@@ -85,7 +88,7 @@ export function useRealCrew(crewId: string | undefined, activeMemberId: string |
     removeMember: removeMember.mutateAsync,
     verifyManagedProfilePin,
     isSaving:
-      claim.isPending || complete.isPending || approve.isPending || add.isPending || addManaged.isPending || goal.isPending || payout.isPending || updateRole.isPending || removeMember.isPending,
-    mutationError: claim.error ?? complete.error ?? approve.error ?? add.error ?? addManaged.error ?? goal.error ?? payout.error ?? updateRole.error ?? removeMember.error,
+      claim.isPending || unclaim.isPending || complete.isPending || approve.isPending || add.isPending || addManaged.isPending || goal.isPending || payout.isPending || updateRole.isPending || removeMember.isPending,
+    mutationError: claim.error ?? unclaim.error ?? complete.error ?? approve.error ?? add.error ?? addManaged.error ?? goal.error ?? payout.error ?? updateRole.error ?? removeMember.error,
   }
 }

@@ -12,6 +12,7 @@ interface HomeViewProps {
   snapshot: CrewSnapshot
   activeMember: Member
   onClaim: (choreId: string) => void
+  onUnclaim: (choreId: string) => void
   onComplete: (choreId: string) => void
   onApprove: (choreId: string) => void
   onAddChore: (input: NewChoreInput) => void
@@ -21,6 +22,7 @@ export function HomeView({
   snapshot,
   activeMember,
   onClaim,
+  onUnclaim,
   onComplete,
   onApprove,
   onAddChore,
@@ -114,7 +116,13 @@ export function HomeView({
           </div>
           <div className={styles.cardGrid}>
             {mine.map((chore) => (
-              <ChoreCard key={chore.id} chore={chore} mode="mine" onAction={() => onComplete(chore.id)} />
+              <ChoreCard
+                key={chore.id}
+                chore={chore}
+                mode="mine"
+                onAction={() => onComplete(chore.id)}
+                onSecondaryAction={() => onUnclaim(chore.id)}
+              />
             ))}
             {waiting.map((chore) => (
               <article className={styles.waitingCard} key={chore.id}>

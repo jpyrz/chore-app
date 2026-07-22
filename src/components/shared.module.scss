@@ -106,7 +106,8 @@
 }
 
 .primaryAction,
-.secondaryAction {
+.secondaryAction,
+.unclaimAction {
   min-height: 38px;
   display: inline-flex;
   align-items: center;
@@ -117,6 +118,13 @@
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
+}
+
+.choreActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
 }
 
 .primaryAction {
@@ -130,4 +138,11 @@
   border: 1px solid #cad7d2;
   background: #edf3ef;
   color: var(--green);
+}
+
+.unclaimAction {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding-inline: 8px;
 }

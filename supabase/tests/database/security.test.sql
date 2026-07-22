@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = extensions, public;
 
-select plan(10);
+select plan(11);
 
 select ok(
   (select relrowsecurity from pg_class where oid = 'public.ledger_entries'::regclass),
@@ -36,6 +36,10 @@ select ok(
 select ok(
   has_function_privilege('authenticated', 'public.approve_chore(uuid,text)', 'EXECUTE'),
   'authenticated managers can call the checked approval function'
+);
+select ok(
+  has_function_privilege('authenticated', 'public.unclaim_chore(uuid,uuid)', 'EXECUTE'),
+  'authenticated members can call the checked unclaim function'
 );
 select ok(
   exists (
