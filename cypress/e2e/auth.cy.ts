@@ -1,4 +1,4 @@
-describe('Choreline authentication', () => {
+describe('Task Tin authentication', () => {
   it('offers real account creation and recovery', () => {
     cy.visit('/')
     cy.contains('Ready when you are.').should('be.visible')

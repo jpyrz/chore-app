@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['mark.svg', 'pwa-192.png', 'pwa-512.png'],
       manifest: {
-        name: 'Choreline',
-        short_name: 'Choreline',
+        name: 'Task Tin',
+        short_name: 'Task Tin',
         description: 'Good work. Real rewards.',
         theme_color: '#f7f3e8',
         background_color: '#f7f3e8',

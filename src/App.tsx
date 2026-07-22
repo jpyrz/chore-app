@@ -171,7 +171,7 @@ function App() {
   const auth = useAuth()
 
   if (!isSupabaseConfigured) return <ConfigurationView />
-  if (auth.loading) return <LoadingScreen message="Opening Choreline…" />
+  if (auth.loading) return <LoadingScreen message="Opening Task Tin…" />
   if (window.location.pathname === '/reset-password' && auth.session) return <ResetPasswordView />
   if (!auth.user) return <AuthView />
   return <SignedInApp authUserId={auth.user.id} />

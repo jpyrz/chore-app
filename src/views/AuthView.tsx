@@ -57,7 +57,7 @@ export function AuthView() {
       <section className={styles.story}>
         <a className={styles.brand} href="/">
           <img src="/mark.svg" alt="" />
-          <span>choreline</span>
+          <span>task tin</span>
         </a>
         <div className={styles.storyCopy}>
           <span className={styles.eyebrow}>Good work lives here</span>
@@ -137,7 +137,7 @@ export function AuthView() {
 
           {mode !== 'forgot' && (
             <p className={styles.switchMode}>
-              {mode === 'sign-in' ? 'New to Choreline?' : 'Already have an account?'}
+              {mode === 'sign-in' ? 'New to Task Tin?' : 'Already have an account?'}
               <button onClick={() => changeMode(mode === 'sign-in' ? 'sign-up' : 'sign-in')}>
                 {mode === 'sign-in' ? 'Create an account' : 'Sign in'}
               </button>

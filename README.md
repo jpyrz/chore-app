@@ -1,12 +1,12 @@
-# Choreline
+# Task Tin
 
 Good work. Real rewards.
 
-Choreline is a mobile-first shared job board for families and other small crews. Managers publish one-time or repeating jobs, members claim and finish them, and approved work is recorded in a transparent earnings ledger.
+Task Tin is a mobile-first shared job board for families and other small crews. Managers publish one-time or repeating jobs, members claim and finish them, and approved work is recorded in a transparent earnings ledger.
 
 ## Current build
 
-Choreline now uses real Supabase accounts and persistent Crew data. The launch workflow includes:
+Task Tin uses real Supabase accounts and persistent Crew data. The launch workflow includes:
 
 - Email/password signup, confirmation, sign-in, sign-out, and password recovery.
 - Create a Crew or join one with an invite code.
@@ -16,7 +16,7 @@ Choreline now uses real Supabase accounts and persistent Crew data. The launch w
 - Claim, finish, approve, and append-only earnings ledger flows.
 - Savings goals and cash/external-payment recording.
 
-There is no payment processor: Choreline records what was earned and what a manager paid outside the app.
+There is no payment processor: Task Tin records what was earned and what a manager paid outside the app.
 
 ## Setup
 

@@ -35,8 +35,8 @@ export function ResetPasswordView() {
           <>
             <CheckCircle2 className={styles.successIcon} size={34} />
             <h1>Password updated.</h1>
-            <p>You’re all set. Head back into Choreline with your new password.</p>
-            <a className={styles.primaryLink} href="/">Return to Choreline</a>
+            <p>You’re all set. Head back into Task Tin with your new password.</p>
+            <a className={styles.primaryLink} href="/">Return to Task Tin</a>
           </>
         ) : (
           <>

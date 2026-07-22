@@ -7,7 +7,7 @@ export function ConfigurationView() {
       <section className={styles.utilityCard}>
         <img src="/mark.svg" alt="" />
         <span className={styles.eyebrow}>Setup needed</span>
-        <h1>Connect Choreline to Supabase.</h1>
+        <h1>Connect Task Tin to Supabase.</h1>
         <p>This build requires a hosted Supabase project before accounts and shared data can work.</p>
         <div className={styles.requirements}>
           <div><Server size={20} /><span><strong>Project URL</strong><small>VITE_SUPABASE_URL</small></span></div>

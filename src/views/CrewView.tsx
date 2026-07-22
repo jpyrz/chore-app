@@ -33,7 +33,7 @@ export function CrewView({
   )
   const [payoutMemberId, setPayoutMemberId] = useState('')
   const [payoutAmount, setPayoutAmount] = useState('')
-  const [payoutDescription, setPayoutDescription] = useState('Paid outside Choreline')
+  const [payoutDescription, setPayoutDescription] = useState('Paid outside Task Tin')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const isManager = activeMember.role === 'owner' || activeMember.role === 'manager'
