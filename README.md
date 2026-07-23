@@ -14,9 +14,11 @@ Task Tin uses real Supabase accounts and persistent Crew data. The launch workfl
 - Parent-managed profiles with PIN entry and password-protected return to parent mode.
 - One-time, daily, weekday, and weekly jobs.
 - Claim, finish, approve, and append-only earnings ledger flows.
-- Savings goals and cash/external-payment recording.
+- Family-bank balances that combine approved chores, gifts, allowance, and other deposits.
+- Manager-only purchase recording and balance corrections that preserve the audit trail.
+- Savings goals measured against the child’s complete bank balance.
 
-There is no payment processor: Task Tin records what was earned and what a manager paid outside the app.
+There is no payment processor: Task Tin tracks money held by the family; it does not store or transfer real funds.
 
 ## Setup
 

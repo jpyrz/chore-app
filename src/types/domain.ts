@@ -35,11 +35,21 @@ export interface Chore {
 export interface LedgerEntry {
   id: string
   memberId: string
-  kind: 'earning' | 'payout'
+  kind: 'earning' | 'payout' | 'adjustment'
+  category: BankTransactionCategory
   amountCents: number
   description: string
   createdAt: string
 }
+
+export type BankTransactionCategory =
+  | 'chore'
+  | 'gift'
+  | 'allowance'
+  | 'deposit'
+  | 'purchase'
+  | 'withdrawal'
+  | 'correction'
 
 export type NotificationKind = 'approval_needed' | 'new_job' | 'payout_recorded'
 
@@ -62,6 +72,7 @@ export interface CrewSnapshot {
   members: Member[]
   chores: Chore[]
   ledger: LedgerEntry[]
+  balances: Record<string, number>
   goals: Record<string, { name: string; targetCents: number }>
 }
 
@@ -99,8 +110,16 @@ export interface ManagedProfileInput {
   color: string
 }
 
-export interface PayoutInput {
+export interface BankTransactionInput {
   memberId: string
+  direction: 'deposit' | 'withdrawal'
+  category: Extract<BankTransactionCategory, 'gift' | 'allowance' | 'deposit' | 'purchase' | 'withdrawal'>
   amountCents: number
+  description: string
+}
+
+export interface BankBalanceInput {
+  memberId: string
+  targetCents: number
   description: string
 }

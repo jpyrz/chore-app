@@ -13,15 +13,16 @@ import {
   joinCrew,
   markAllNotificationsRead,
   markNotificationRead,
-  recordRealPayout,
+  recordBankTransaction,
   removeRealMember,
+  setBankBalance,
   setSavingsGoal,
   unclaimRealChore,
   updateRealMemberRole,
   verifyManagedProfilePin,
 } from '../api/chorelineRepository'
 import { supabase } from '../api/supabase'
-import type { ManagedProfileInput, MemberRole, NewChoreInput, PayoutInput } from '../types/domain'
+import type { BankBalanceInput, BankTransactionInput, ManagedProfileInput, MemberRole, NewChoreInput } from '../types/domain'
 
 function useCrewMutation<T>(queryKey: Array<string | undefined>, mutationFn: (input: T) => Promise<unknown>) {
   const queryClient = useQueryClient()
@@ -116,7 +117,8 @@ export function useRealCrew(crewId: string | undefined, activeMemberId: string |
   const goal = useCrewMutation<{ name: string; targetCents: number }>(queryKey, (input) =>
     setSavingsGoal(crewId!, activeMemberId!, input.name, input.targetCents),
   )
-  const payout = useCrewMutation<PayoutInput>(queryKey, (input) => recordRealPayout(crewId!, input))
+  const bankTransaction = useCrewMutation<BankTransactionInput>(queryKey, (input) => recordBankTransaction(crewId!, input))
+  const bankBalance = useCrewMutation<BankBalanceInput>(queryKey, (input) => setBankBalance(crewId!, input))
   const updateRole = useCrewMutation<{ memberId: string; role: MemberRole }>(queryKey, (input) =>
     updateRealMemberRole(crewId!, input.memberId, input.role),
   )
@@ -139,7 +141,8 @@ export function useRealCrew(crewId: string | undefined, activeMemberId: string |
     addChore: add.mutateAsync,
     addManagedProfile: addManaged.mutateAsync,
     updateGoal: goal.mutateAsync,
-    recordPayout: payout.mutateAsync,
+    recordBankTransaction: bankTransaction.mutateAsync,
+    setBankBalance: bankBalance.mutateAsync,
     updateMemberRole: updateRole.mutateAsync,
     removeMember: removeMember.mutateAsync,
     notifications: notificationsQuery.data ?? [],
@@ -147,7 +150,7 @@ export function useRealCrew(crewId: string | undefined, activeMemberId: string |
     markAllNotificationsRead: markAllRead.mutateAsync,
     verifyManagedProfilePin,
     isSaving:
-      claim.isPending || unclaim.isPending || complete.isPending || approve.isPending || add.isPending || addManaged.isPending || goal.isPending || payout.isPending || updateRole.isPending || removeMember.isPending,
-    mutationError: claim.error ?? unclaim.error ?? complete.error ?? approve.error ?? add.error ?? addManaged.error ?? goal.error ?? payout.error ?? updateRole.error ?? removeMember.error,
+      claim.isPending || unclaim.isPending || complete.isPending || approve.isPending || add.isPending || addManaged.isPending || goal.isPending || bankTransaction.isPending || bankBalance.isPending || updateRole.isPending || removeMember.isPending,
+    mutationError: claim.error ?? unclaim.error ?? complete.error ?? approve.error ?? add.error ?? addManaged.error ?? goal.error ?? bankTransaction.error ?? bankBalance.error ?? updateRole.error ?? removeMember.error,
   }
 }

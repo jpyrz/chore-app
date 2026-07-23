@@ -2,7 +2,7 @@
 
 ## Product
 
-- Product: Task Tin, a shared job board where people complete useful work and track what they earn.
+- Product: Task Tin, a shared job board and family money ledger where people complete useful work and track what they can save or spend.
 - Primary user loop: A manager publishes work, a member claims and finishes it, a manager approves it, and the ledger records the earning.
 - Launch model: Invite-only beta.
 - Mobile-first target: 360–430 px, followed by tablet and desktop adaptations.
@@ -33,6 +33,7 @@
 - Keep service-role keys, passwords, and tokens out of client code and Git.
 - Put sensitive multi-record operations in trusted procedures/functions.
 - Treat `ledger_entries` as append-only. An approved occurrence creates at most one earning through an idempotent database procedure.
+- Bank deposits, purchases, and corrections must use trusted procedures. The current balance is derived from the complete ledger, never a client-side partial history.
 - Claiming and approval must remain atomic. Never implement balance changes as client-composed table writes.
 - Managed profiles may omit `auth_user_id`; their authenticated manager is responsible for actions performed on their behalf.
 - A managed-profile PIN is a shared-device convenience gate, not a separate Supabase identity. Persist child mode across refreshes and require account reauthentication before restoring parent controls.

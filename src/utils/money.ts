@@ -13,3 +13,9 @@ export function getBalance(entries: LedgerEntry[], memberId: string): number {
     .filter((entry) => entry.memberId === memberId)
     .reduce((total, entry) => total + entry.amountCents, 0)
 }
+
+export function getOnTheWayTotal(chores: Array<{ assigneeId?: string; rewardCents: number; status: string }>, memberId: string): number {
+  return chores
+    .filter((chore) => chore.assigneeId === memberId && (chore.status === 'claimed' || chore.status === 'review'))
+    .reduce((total, chore) => total + chore.rewardCents, 0)
+}

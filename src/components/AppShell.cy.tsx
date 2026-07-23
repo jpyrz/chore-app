@@ -36,8 +36,9 @@ const snapshot: CrewSnapshot = {
     },
   ],
   ledger: [
-    { id: 'earning-1', memberId: 'mia', kind: 'earning', amountCents: 800, description: 'Fold the laundry', createdAt: new Date().toISOString() },
+    { id: 'earning-1', memberId: 'mia', kind: 'earning', category: 'chore', amountCents: 800, description: 'Fold the laundry', createdAt: new Date().toISOString() },
   ],
+  balances: { james: 0, mia: 800 },
   goals: {
     james: { name: 'Something worth saving for', targetCents: 2500 },
     mia: { name: 'New art supplies', targetCents: 3000 },
@@ -79,5 +80,6 @@ describe('AppShell mobile navigation', () => {
     cy.get('nav[aria-label="Main navigation"]')
       .should('have.css', 'bottom', '12px')
       .and('have.css', 'border-radius', '23px')
+    cy.contains('nav a', 'Bank').should('be.visible')
   })
 })

@@ -5,7 +5,7 @@ import { AddChoreModal } from '../components/AddChoreModal'
 import { Avatar } from '../components/Avatar'
 import { ChoreCard } from '../components/ChoreCard'
 import type { CrewSnapshot, Member, NewChoreInput } from '../types/domain'
-import { formatMoney, getBalance } from '../utils/money'
+import { formatMoney, getOnTheWayTotal } from '../utils/money'
 import styles from './views.module.scss'
 
 interface HomeViewProps {
@@ -39,7 +39,8 @@ export function HomeView({
   const review = snapshot.chores.filter((chore) => chore.status === 'review')
   const latestEarning = snapshot.ledger.find((entry) => entry.kind === 'earning')
   const latestEarner = snapshot.members.find((member) => member.id === latestEarning?.memberId)
-  const balance = getBalance(snapshot.ledger, activeMember.id)
+  const balance = snapshot.balances[activeMember.id] ?? 0
+  const onTheWay = getOnTheWayTotal(snapshot.chores, activeMember.id)
   const goal = snapshot.goals[activeMember.id]
   const progress = Math.min(100, Math.max(0, (balance / goal.targetCents) * 100))
   const greeting = useMemo(() => {
@@ -63,9 +64,9 @@ export function HomeView({
         </div>
 
         <Link to="/earnings" className={styles.balanceCard}>
-          <span>You’ve earned</span>
+          <span>In your bank</span>
           <strong>{formatMoney(balance)}</strong>
-          <small>See your earnings <ArrowRight size={14} /></small>
+          <small>{onTheWay > 0 ? `${formatMoney(onTheWay)} on the way` : 'Open your bank'} <ArrowRight size={14} /></small>
         </Link>
       </section>
 

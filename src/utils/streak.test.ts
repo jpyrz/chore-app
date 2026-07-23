@@ -3,7 +3,7 @@ import type { LedgerEntry } from '../types/domain'
 import { calculateStreak } from './streak'
 
 function earning(day: string): LedgerEntry {
-  return { id: day, memberId: 'kid', kind: 'earning', amountCents: 100, description: 'Job', createdAt: `${day}T12:00:00` }
+  return { id: day, memberId: 'kid', kind: 'earning', category: 'chore', amountCents: 100, description: 'Job', createdAt: `${day}T12:00:00` }
 }
 
 describe('calculateStreak', () => {
@@ -19,7 +19,7 @@ describe('calculateStreak', () => {
     const entries: LedgerEntry[] = [
       earning('2026-07-21'),
       { ...earning('2026-07-22'), id: 'other', memberId: 'other' },
-      { ...earning('2026-07-22'), id: 'payout', kind: 'payout' },
+      { ...earning('2026-07-22'), id: 'payout', kind: 'payout', category: 'withdrawal' },
     ]
     expect(calculateStreak(entries, 'kid', new Date(2026, 6, 22, 8))).toBe(1)
   })

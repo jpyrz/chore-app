@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = extensions, public;
 
-select plan(22);
+select plan(25);
 
 select ok(
   (select relrowsecurity from pg_class where oid = 'public.ledger_entries'::regclass),
@@ -82,6 +82,18 @@ select ok(
 select ok(
   has_function_privilege('authenticated', 'public.mark_all_notifications_read(uuid,uuid)', 'EXECUTE'),
   'authenticated profiles can call the checked mark-all-read function'
+);
+select ok(
+  has_function_privilege('authenticated', 'public.record_bank_transaction(uuid,uuid,text,text,integer,text,text)', 'EXECUTE'),
+  'authenticated managers can call the checked bank transaction function'
+);
+select ok(
+  has_function_privilege('authenticated', 'public.set_bank_balance(uuid,uuid,integer,text,text)', 'EXECUTE'),
+  'authenticated managers can call the checked balance correction function'
+);
+select ok(
+  has_table_privilege('authenticated', 'public.bank_balances', 'SELECT'),
+  'authenticated profiles can read bank balances through the security-invoker view'
 );
 select ok(
   exists (

@@ -30,7 +30,7 @@ interface AppShellProps extends PropsWithChildren {
 
 const navigation = [
   { to: '/', label: 'Home', icon: House },
-  { to: '/earnings', label: 'Earnings', icon: WalletCards },
+  { to: '/earnings', label: 'Bank', icon: WalletCards },
   { to: '/crew', label: 'Crew', icon: UsersRound },
   { to: '/profile', label: 'You', icon: CircleUserRound },
 ]

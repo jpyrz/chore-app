@@ -2,6 +2,8 @@ import { supabase } from './supabase'
 import type {
   AccountContext,
   AppNotification,
+  BankBalanceInput,
+  BankTransactionInput,
   Chore,
   ChoreCategory,
   CrewMembershipSummary,
@@ -11,7 +13,6 @@ import type {
   Member,
   MemberRole,
   NewChoreInput,
-  PayoutInput,
 } from '../types/domain'
 import { calculateStreak } from '../utils/streak'
 
@@ -61,9 +62,15 @@ interface LedgerRow {
   id: string
   member_id: string
   kind: 'earning' | 'payout' | 'adjustment'
+  category: 'chore' | 'gift' | 'allowance' | 'deposit' | 'purchase' | 'withdrawal' | 'correction'
   amount_cents: number
   description: string
   created_at: string
+}
+
+interface BankBalanceRow {
+  member_id: string
+  balance_cents: number
 }
 
 interface NotificationRow {
@@ -130,7 +137,7 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
   const ensured = await api.rpc('ensure_due_occurrences', { p_crew_id: crewId })
   if (ensured.error) throw new Error(ensured.error.message)
 
-  const [crewResult, membersResult, choresResult, ledgerResult, goalsResult] = await Promise.all([
+  const [crewResult, membersResult, choresResult, ledgerResult, balancesResult, goalsResult] = await Promise.all([
     api.from('crews').select('id, name, invite_code').eq('id', crewId).single(),
     api
       .from('crew_members')
@@ -145,10 +152,11 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
       .order('due_at', { ascending: true, nullsFirst: false }),
     api
       .from('ledger_entries')
-      .select('id, member_id, kind, amount_cents, description, created_at')
+      .select('id, member_id, kind, category, amount_cents, description, created_at')
       .eq('crew_id', crewId)
       .order('created_at', { ascending: false })
       .limit(200),
+    api.from('bank_balances').select('member_id, balance_cents').eq('crew_id', crewId),
     api.from('savings_goals').select('member_id, name, target_cents').eq('crew_id', crewId),
   ])
 
@@ -187,12 +195,21 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
   const ledger: LedgerEntry[] = ledgerRows.map((row) => ({
     id: row.id,
     memberId: row.member_id,
-    kind: row.kind === 'payout' ? 'payout' : 'earning',
+    kind: row.kind,
+    category: row.category,
     amountCents: row.amount_cents,
     description: row.description,
     createdAt: row.created_at,
   }))
   for (const member of members) member.streak = calculateStreak(ledger, member.id)
+
+  if (balancesResult.error) throw new Error(balancesResult.error.message)
+  const balances = Object.fromEntries(
+    ((balancesResult.data ?? []) as BankBalanceRow[]).map((balance) => [balance.member_id, balance.balance_cents]),
+  )
+  for (const member of members) {
+    if (balances[member.id] === undefined) balances[member.id] = 0
+  }
 
   if (goalsResult.error) throw new Error(goalsResult.error.message)
   const goals = Object.fromEntries(
@@ -211,6 +228,7 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
     members,
     chores,
     ledger,
+    balances,
     goals,
   }
 }
@@ -326,11 +344,24 @@ export async function setSavingsGoal(crewId: string, memberId: string, name: str
   if (error) throw new Error(error.message)
 }
 
-export async function recordRealPayout(crewId: string, input: PayoutInput) {
-  const { error } = await client().rpc('record_payout', {
+export async function recordBankTransaction(crewId: string, input: BankTransactionInput) {
+  const { error } = await client().rpc('record_bank_transaction', {
     p_crew_id: crewId,
     p_member_id: input.memberId,
+    p_direction: input.direction,
+    p_category: input.category,
     p_amount_cents: input.amountCents,
+    p_description: input.description,
+    p_idempotency_key: crypto.randomUUID(),
+  })
+  if (error) throw new Error(error.message)
+}
+
+export async function setBankBalance(crewId: string, input: BankBalanceInput) {
+  const { error } = await client().rpc('set_bank_balance', {
+    p_crew_id: crewId,
+    p_member_id: input.memberId,
+    p_target_cents: input.targetCents,
     p_description: input.description,
     p_idempotency_key: crypto.randomUUID(),
   })

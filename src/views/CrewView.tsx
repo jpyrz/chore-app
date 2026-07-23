@@ -1,15 +1,16 @@
-import { Check, Copy, DollarSign, Flame, KeyRound, UserPlus, X } from 'lucide-react'
-import { useMemo, useState, type FormEvent } from 'react'
+import { Check, Copy, Flame, KeyRound, Landmark, UserPlus, X } from 'lucide-react'
+import { useState, type FormEvent } from 'react'
 import { Avatar } from '../components/Avatar'
-import type { CrewSnapshot, ManagedProfileInput, Member, MemberRole, PayoutInput } from '../types/domain'
-import { formatMoney, getBalance } from '../utils/money'
+import type { BankBalanceInput, BankTransactionCategory, BankTransactionInput, CrewSnapshot, ManagedProfileInput, Member, MemberRole } from '../types/domain'
+import { formatMoney } from '../utils/money'
 import styles from './views.module.scss'
 
 interface CrewViewProps {
   snapshot: CrewSnapshot
   activeMember: Member
   onAddManagedProfile: (input: ManagedProfileInput) => Promise<unknown>
-  onRecordPayout: (input: PayoutInput) => Promise<unknown>
+  onRecordBankTransaction: (input: BankTransactionInput) => Promise<unknown>
+  onSetBankBalance: (input: BankBalanceInput) => Promise<unknown>
   onUpdateRole: (input: { memberId: string; role: MemberRole }) => Promise<unknown>
   onRemoveMember: (memberId: string) => Promise<unknown>
 }
@@ -18,22 +19,21 @@ export function CrewView({
   snapshot,
   activeMember,
   onAddManagedProfile,
-  onRecordPayout,
+  onRecordBankTransaction,
+  onSetBankBalance,
   onUpdateRole,
   onRemoveMember,
 }: CrewViewProps) {
   const [copied, setCopied] = useState(false)
-  const [modal, setModal] = useState<'managed' | 'payout' | null>(null)
+  const [modal, setModal] = useState<'managed' | 'bank' | null>(null)
   const [name, setName] = useState('')
   const [pin, setPin] = useState('')
   const [color, setColor] = useState('#ef745e')
-  const payableMembers = useMemo(
-    () => snapshot.members.filter((member) => getBalance(snapshot.ledger, member.id) > 0),
-    [snapshot.ledger, snapshot.members],
-  )
-  const [payoutMemberId, setPayoutMemberId] = useState('')
-  const [payoutAmount, setPayoutAmount] = useState('')
-  const [payoutDescription, setPayoutDescription] = useState('Paid outside Task Tin')
+  const [bankMemberId, setBankMemberId] = useState('')
+  const [bankAction, setBankAction] = useState<'add' | 'spend' | 'correct'>('add')
+  const [bankCategory, setBankCategory] = useState<Extract<BankTransactionCategory, 'gift' | 'allowance' | 'deposit'>>('gift')
+  const [bankAmount, setBankAmount] = useState('')
+  const [bankDescription, setBankDescription] = useState('Birthday gift')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const isManager = activeMember.role === 'owner' || activeMember.role === 'manager'
@@ -44,12 +44,14 @@ export function CrewView({
     window.setTimeout(() => setCopied(false), 1600)
   }
 
-  const openPayout = () => {
-    const first = payableMembers[0]
-    setPayoutMemberId(first?.id ?? '')
-    setPayoutAmount(first ? (getBalance(snapshot.ledger, first.id) / 100).toFixed(2) : '')
+  const openBank = (memberId = snapshot.members[0]?.id ?? '') => {
+    setBankMemberId(memberId)
+    setBankAction('add')
+    setBankCategory('gift')
+    setBankAmount('')
+    setBankDescription('Birthday gift')
     setError('')
-    setModal('payout')
+    setModal('bank')
   }
 
   const submitManaged = async (event: FormEvent) => {
@@ -68,17 +70,27 @@ export function CrewView({
     }
   }
 
-  const submitPayout = async (event: FormEvent) => {
+  const submitBank = async (event: FormEvent) => {
     event.preventDefault()
     setError('')
-    const amountCents = Math.round(Number(payoutAmount) * 100)
-    if (!payoutMemberId || !Number.isFinite(amountCents) || amountCents <= 0) return
+    const amountCents = Math.round(Number(bankAmount) * 100)
+    if (!bankMemberId || !Number.isFinite(amountCents) || amountCents < 0 || (bankAction !== 'correct' && amountCents === 0)) return
     setSaving(true)
     try {
-      await onRecordPayout({ memberId: payoutMemberId, amountCents, description: payoutDescription.trim() })
+      if (bankAction === 'correct') {
+        await onSetBankBalance({ memberId: bankMemberId, targetCents: amountCents, description: bankDescription.trim() })
+      } else {
+        await onRecordBankTransaction({
+          memberId: bankMemberId,
+          direction: bankAction === 'add' ? 'deposit' : 'withdrawal',
+          category: bankAction === 'add' ? bankCategory : 'purchase',
+          amountCents,
+          description: bankDescription.trim(),
+        })
+      }
       setModal(null)
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'The payout could not be recorded.')
+      setError(caught instanceof Error ? caught.message : 'The bank activity could not be recorded.')
     } finally {
       setSaving(false)
     }
@@ -108,7 +120,7 @@ export function CrewView({
       {isManager && (
         <div className={styles.crewActions}>
           <button onClick={() => { setError(''); setModal('managed') }}><KeyRound size={17} /> Add a child profile</button>
-          <button onClick={openPayout} disabled={payableMembers.length === 0}><DollarSign size={17} /> Record a payout</button>
+          <button onClick={() => openBank()} disabled={snapshot.members.length === 0}><Landmark size={17} /> Manage banks</button>
         </div>
       )}
 
@@ -135,7 +147,12 @@ export function CrewView({
                   {member.streak > 0 && <span><Flame size={15} fill="currentColor" /> {member.streak} day rhythm</span>}
                   <span>{completed} jobs logged</span>
                 </div>
-                <strong>{formatMoney(getBalance(snapshot.ledger, member.id))} ready</strong>
+                <strong>{formatMoney(snapshot.balances[member.id] ?? 0)} in bank</strong>
+                {isManager && (
+                  <button className={styles.manageBankButton} onClick={() => openBank(member.id)}>
+                    <Landmark size={15} /> Manage bank
+                  </button>
+                )}
                 {activeMember.role === 'owner' && member.id !== activeMember.id && (
                   <div className={styles.memberAdmin}>
                     <label>
@@ -190,27 +207,49 @@ export function CrewView({
         </div>
       )}
 
-      {modal === 'payout' && (
+      {modal === 'bank' && (
         <div className={styles.inlineModalBackdrop} role="presentation" onMouseDown={() => setModal(null)}>
-          <section className={styles.inlineModal} role="dialog" aria-modal="true" aria-labelledby="payout-heading" onMouseDown={(event) => event.stopPropagation()}>
+          <section className={styles.inlineModal} role="dialog" aria-modal="true" aria-labelledby="bank-heading" onMouseDown={(event) => event.stopPropagation()}>
             <button className={styles.modalClose} onClick={() => setModal(null)} aria-label="Close"><X size={18} /></button>
-            <span className={styles.modalIcon}><DollarSign size={22} /></span>
-            <h2 id="payout-heading">Record a payout</h2>
-            <p>Record money you already paid by cash or another service.</p>
-            <form onSubmit={submitPayout}>
+            <span className={styles.modalIcon}><Landmark size={22} /></span>
+            <h2 id="bank-heading">Manage a bank</h2>
+            <p>Add gifts, record purchases, or correct a balance without erasing its history.</p>
+            <form onSubmit={submitBank}>
               <label>Member
-                <select value={payoutMemberId} onChange={(event) => {
+                <select value={bankMemberId} onChange={(event) => {
                   const memberId = event.target.value
-                  setPayoutMemberId(memberId)
-                  setPayoutAmount((getBalance(snapshot.ledger, memberId) / 100).toFixed(2))
+                  setBankMemberId(memberId)
+                  if (bankAction === 'correct') setBankAmount(((snapshot.balances[memberId] ?? 0) / 100).toFixed(2))
                 }}>
-                  {payableMembers.map((member) => <option key={member.id} value={member.id}>{member.name} · {formatMoney(getBalance(snapshot.ledger, member.id))}</option>)}
+                  {snapshot.members.map((member) => <option key={member.id} value={member.id}>{member.name} · {formatMoney(snapshot.balances[member.id] ?? 0)}</option>)}
                 </select>
               </label>
-              <label>Amount<input value={payoutAmount} onChange={(event) => setPayoutAmount(event.target.value)} inputMode="decimal" required /></label>
-              <label>Note<input value={payoutDescription} onChange={(event) => setPayoutDescription(event.target.value)} maxLength={160} required /></label>
+              <label>Action
+                <select value={bankAction} onChange={(event) => {
+                  const action = event.target.value as 'add' | 'spend' | 'correct'
+                  setBankAction(action)
+                  setBankAmount(action === 'correct' ? ((snapshot.balances[bankMemberId] ?? 0) / 100).toFixed(2) : '')
+                  setBankDescription(action === 'add' ? 'Birthday gift' : action === 'spend' ? 'Store purchase' : 'Balance correction')
+                }}>
+                  <option value="add">Add money</option>
+                  <option value="spend">Record a purchase</option>
+                  <option value="correct">Correct the balance</option>
+                </select>
+              </label>
+              {bankAction === 'add' && (
+                <label>Money came from
+                  <select value={bankCategory} onChange={(event) => setBankCategory(event.target.value as typeof bankCategory)}>
+                    <option value="gift">Gift</option>
+                    <option value="allowance">Allowance</option>
+                    <option value="deposit">Something else</option>
+                  </select>
+                </label>
+              )}
+              <label>{bankAction === 'correct' ? 'New balance' : 'Amount'}<input value={bankAmount} onChange={(event) => setBankAmount(event.target.value)} inputMode="decimal" min="0" step="0.01" required /></label>
+              <label>Note<input value={bankDescription} onChange={(event) => setBankDescription(event.target.value)} maxLength={160} required /></label>
+              {bankAction === 'correct' && <p className={styles.bankHint}>Task Tin will add a correction for the difference. Earlier activity stays visible.</p>}
               {error && <p className={styles.modalError} role="alert">{error}</p>}
-              <button disabled={saving}>{saving ? 'Recording…' : 'Record payout'}</button>
+              <button disabled={saving}>{saving ? 'Saving…' : bankAction === 'add' ? 'Add to bank' : bankAction === 'spend' ? 'Record purchase' : 'Correct balance'}</button>
             </form>
           </section>
         </div>

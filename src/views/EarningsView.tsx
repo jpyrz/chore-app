@@ -1,8 +1,18 @@
 import { ArrowDownLeft, ArrowUpRight, Pencil, Target, X } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import type { CrewSnapshot, Member } from '../types/domain'
-import { formatMoney, getBalance } from '../utils/money'
+import { formatMoney, getOnTheWayTotal } from '../utils/money'
 import styles from './views.module.scss'
+
+const categoryLabels = {
+  chore: 'Chore',
+  gift: 'Gift',
+  allowance: 'Allowance',
+  deposit: 'Deposit',
+  purchase: 'Purchase',
+  withdrawal: 'Withdrawal',
+  correction: 'Correction',
+}
 
 export function EarningsView({
   snapshot,
@@ -14,10 +24,8 @@ export function EarningsView({
   onUpdateGoal: (input: { name: string; targetCents: number }) => Promise<unknown>
 }) {
   const entries = snapshot.ledger.filter((entry) => entry.memberId === activeMember.id)
-  const balance = getBalance(snapshot.ledger, activeMember.id)
-  const lifetime = entries
-    .filter((entry) => entry.kind === 'earning')
-    .reduce((total, entry) => total + entry.amountCents, 0)
+  const balance = snapshot.balances[activeMember.id] ?? 0
+  const onTheWay = getOnTheWayTotal(snapshot.chores, activeMember.id)
   const goal = snapshot.goals[activeMember.id]
   const progress = Math.min(100, Math.max(0, (balance / goal.targetCents) * 100))
   const [editingGoal, setEditingGoal] = useState(false)
@@ -35,19 +43,19 @@ export function EarningsView({
   return (
     <div className={styles.page}>
       <header className={styles.pageHeader}>
-        <span className={styles.eyebrow}>Your money</span>
-        <h1>Every job adds up.</h1>
-        <p>A clear record of what you’ve earned and what’s been paid.</p>
+        <span className={styles.eyebrow}>Your bank</span>
+        <h1>Your money, all together.</h1>
+        <p>See what you can spend now, what’s on the way, and where your money has gone.</p>
       </header>
 
       <section className={styles.earningsHero}>
         <div>
-          <span>Ready to be paid</span>
+          <span>Bank balance</span>
           <strong>{formatMoney(balance)}</strong>
         </div>
         <div>
-          <span>All-time earned</span>
-          <strong>{formatMoney(lifetime)}</strong>
+          <span>On the way</span>
+          <strong>{formatMoney(onTheWay)}</strong>
         </div>
       </section>
 
@@ -88,18 +96,19 @@ export function EarningsView({
         <div className={styles.ledgerList}>
           {entries.map((entry) => (
             <article key={entry.id}>
-              <span className={entry.kind === 'earning' ? styles.earnedIcon : styles.paidIcon}>
-                {entry.kind === 'earning' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
+              <span className={entry.amountCents > 0 ? styles.earnedIcon : styles.paidIcon}>
+                {entry.amountCents > 0 ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
               </span>
               <div>
                 <strong>{entry.description}</strong>
-                <small>{new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(entry.createdAt))}</small>
+                <small>{new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(entry.createdAt))} · {categoryLabels[entry.category]}</small>
               </div>
               <b className={entry.amountCents > 0 ? styles.positive : ''}>
                 {entry.amountCents > 0 ? '+' : ''}{formatMoney(entry.amountCents)}
               </b>
             </article>
           ))}
+          {entries.length === 0 && <p className={styles.emptyLedger}>Your first deposit or approved job will show up here.</p>}
         </div>
       </section>
     </div>

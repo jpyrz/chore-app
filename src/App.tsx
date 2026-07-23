@@ -139,7 +139,8 @@ function SignedInApp({ authUserId }: { authUserId: string }) {
               snapshot={crew.data}
               activeMember={activeMember}
               onAddManagedProfile={crew.addManagedProfile}
-              onRecordPayout={crew.recordPayout}
+              onRecordBankTransaction={crew.recordBankTransaction}
+              onSetBankBalance={crew.setBankBalance}
               onUpdateRole={crew.updateMemberRole}
               onRemoveMember={crew.removeMember}
             />

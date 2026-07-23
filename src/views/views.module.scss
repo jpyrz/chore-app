@@ -325,7 +325,10 @@
 
 .inlineModal {
   width: min(100%, 440px);
+  max-height: calc(100svh - 36px);
   position: relative;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 26px;
   background: var(--paper);
   border-radius: 25px;
@@ -395,6 +398,14 @@
 .paidIcon { background: #fbe2dc; color: #a34837; }
 .positive { color: var(--green-bright); }
 
+.emptyLedger {
+  margin: 0;
+  padding: 24px 18px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
 .inviteCard {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -458,6 +469,7 @@
 }
 
 .modalError { margin: 0; color: #8e382a !important; font-size: 11px !important; }
+.bankHint { margin: -2px 0 0 !important; color: var(--muted) !important; font-size: 10px !important; line-height: 1.45; }
 
 .memberGrid {
   display: grid;
@@ -472,6 +484,23 @@
 
   h3 { margin: 12px 0 7px; font-size: 20px; }
   > strong { display: block; margin-top: 14px; color: var(--green); font-family: 'Nunito', sans-serif; font-size: 13px; }
+}
+
+.manageBankButton {
+  width: 100%;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  border: 1px solid #c8d5cc;
+  border-radius: 11px;
+  background: #eff3ed;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 .memberTop {
