@@ -12,6 +12,17 @@ interface ChoreCardProps {
   onSecondaryAction?: () => void
 }
 
+function claimDeadlineLabel(expiresAt: string) {
+  const deadline = new Date(expiresAt)
+  const today = new Date()
+  const sameDay = deadline.toDateString() === today.toDateString()
+  return new Intl.DateTimeFormat('en-US', {
+    weekday: sameDay ? undefined : 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(deadline)
+}
+
 export function ChoreCard({ chore, mode, memberName, onAction, onSecondaryAction }: ChoreCardProps) {
   const actionLabel = mode === 'available' ? 'I’ll do it' : mode === 'mine' ? 'Mark finished' : 'Approve'
 
@@ -24,7 +35,7 @@ export function ChoreCard({ chore, mode, memberName, onAction, onSecondaryAction
           <p>
             <Clock3 size={14} aria-hidden="true" />
             {mode === 'review' && memberName ? `${memberName} · ` : ''}
-            {chore.timing}
+            {mode === 'mine' && chore.claimExpiresAt ? `Finish by ${claimDeadlineLabel(chore.claimExpiresAt)}` : chore.timing}
           </p>
         </div>
         <strong className={styles.reward}>{formatMoney(chore.rewardCents)}</strong>

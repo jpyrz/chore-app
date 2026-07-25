@@ -29,6 +29,7 @@ export interface Chore {
   cadence: string
   status: ChoreStatus
   assigneeId?: string
+  claimExpiresAt?: string
   instructions?: string
 }
 

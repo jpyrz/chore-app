@@ -14,6 +14,7 @@ Task Tin uses real Supabase accounts and persistent Crew data. The launch workfl
 - Parent-managed profiles with PIN entry and password-protected return to parent mode.
 - One-time, daily, weekday, and weekly jobs.
 - Claim, finish, approve, and append-only earnings ledger flows.
+- Twenty-four-hour claim windows that automatically return unfinished jobs to the available pool.
 - Family-bank balances that combine approved chores, gifts, allowance, and other deposits.
 - Manager-only purchase recording and balance corrections that preserve the audit trail.
 - Savings goals measured against the child’s complete bank balance.

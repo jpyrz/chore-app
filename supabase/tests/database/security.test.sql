@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = extensions, public;
 
-select plan(25);
+select plan(28);
 
 select ok(
   (select relrowsecurity from pg_class where oid = 'public.ledger_entries'::regclass),
@@ -40,6 +40,20 @@ select ok(
 select ok(
   has_function_privilege('authenticated', 'public.unclaim_chore(uuid,uuid)', 'EXECUTE'),
   'authenticated members can call the checked unclaim function'
+);
+select ok(
+  to_regprocedure('public.release_expired_claims(uuid)') is not null,
+  'the expired-claim release function exists'
+);
+select ok(
+  not has_function_privilege('authenticated', 'public.release_expired_claims(uuid)', 'EXECUTE'),
+  'browser users cannot release claims directly'
+);
+select ok(
+  position(
+    'release_expired_claims' in pg_get_functiondef('public.ensure_due_occurrences(uuid)'::regprocedure)
+  ) > 0,
+  'Crew refreshes invoke expired-claim release'
 );
 select ok(
   exists (

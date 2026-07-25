@@ -43,6 +43,7 @@ describe('ChoreCard', () => {
           cadence: 'Daily',
           status: 'claimed',
           assigneeId: 'member-1',
+          claimExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         }}
         mode="mine"
         onAction={onFinish}
@@ -50,6 +51,7 @@ describe('ChoreCard', () => {
       />,
     )
 
+    cy.contains('Finish by').should('be.visible')
     cy.contains('button', 'Unclaim').click()
     cy.get('@unclaim').should('have.been.calledOnce')
     cy.get('@finish').should('not.have.been.called')

@@ -54,6 +54,7 @@ interface ChoreRow {
   due_at: string | null
   status: 'available' | 'claimed' | 'review' | 'completed' | 'cancelled'
   assignee_id: string | null
+  claimed_at: string | null
   instructions: string | null
   chore_templates: { cadence: string } | Array<{ cadence: string }> | null
 }
@@ -146,7 +147,7 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
       .order('joined_at'),
     api
       .from('chore_occurrences')
-      .select('id, title, category, reward_cents, due_at, status, assignee_id, instructions, chore_templates(cadence)')
+      .select('id, title, category, reward_cents, due_at, status, assignee_id, claimed_at, instructions, chore_templates(cadence)')
       .eq('crew_id', crewId)
       .in('status', ['available', 'claimed', 'review'])
       .order('due_at', { ascending: true, nullsFirst: false }),
@@ -187,6 +188,9 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
       cadence: cadenceLabels[template?.cadence ?? 'one_time'] ?? 'One time',
       status: row.status === 'cancelled' ? 'completed' : row.status,
       assigneeId: row.assignee_id ?? undefined,
+      claimExpiresAt: row.claimed_at
+        ? new Date(new Date(row.claimed_at).getTime() + 24 * 60 * 60 * 1000).toISOString()
+        : undefined,
       instructions: row.instructions ?? undefined,
     }
   })
