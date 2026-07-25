@@ -42,11 +42,42 @@ describe('Crew bank controls', () => {
     cy.contains('h2', 'Manage a bank').should('be.visible')
     cy.contains('label', 'Action').find('select').select('Correct the balance')
     cy.contains('label', 'New balance').find('input').clear().type('0')
+    cy.contains('label', 'Note').find('input').should('have.value', '').and('not.have.attr', 'required')
     cy.contains('button', 'Correct balance').click()
     cy.wrap(setBalance).should('have.been.calledWithMatch', {
       memberId: 'mia',
       targetCents: 0,
       description: 'Balance correction',
+    })
+  })
+
+  it('adds money quickly without requiring a note', () => {
+    const recordTransaction = cy.stub().resolves()
+
+    mount(
+      <CrewView
+        snapshot={snapshot}
+        activeMember={snapshot.members[0]}
+        onAddManagedProfile={cy.stub().resolves()}
+        onRecordBankTransaction={recordTransaction}
+        onSetBankBalance={cy.stub().resolves()}
+        onUpdateRole={cy.stub().resolves()}
+        onRemoveMember={cy.stub().resolves()}
+      />,
+    )
+
+    cy.contains('article', 'Mia').within(() => cy.contains('button', 'Manage bank').click())
+    cy.contains('label', 'Amount').find('input').type('20')
+    cy.contains('label', 'Note').find('input')
+      .should('have.value', '')
+      .and('have.attr', 'placeholder', 'Birthday, holiday, or who it came from')
+    cy.contains('button', 'Add to bank').click()
+    cy.wrap(recordTransaction).should('have.been.calledWithMatch', {
+      memberId: 'mia',
+      direction: 'deposit',
+      category: 'gift',
+      amountCents: 2000,
+      description: 'Gift',
     })
   })
 })

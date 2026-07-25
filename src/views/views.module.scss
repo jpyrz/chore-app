@@ -471,6 +471,14 @@
 .modalError { margin: 0; color: #8e382a !important; font-size: 11px !important; }
 .bankHint { margin: -2px 0 0 !important; color: var(--muted) !important; font-size: 10px !important; line-height: 1.45; }
 
+.optionalLabel {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  small { color: var(--muted); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+}
+
 .memberGrid {
   display: grid;
   gap: 12px;

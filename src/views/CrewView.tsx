@@ -33,7 +33,7 @@ export function CrewView({
   const [bankAction, setBankAction] = useState<'add' | 'spend' | 'correct'>('add')
   const [bankCategory, setBankCategory] = useState<Extract<BankTransactionCategory, 'gift' | 'allowance' | 'deposit'>>('gift')
   const [bankAmount, setBankAmount] = useState('')
-  const [bankDescription, setBankDescription] = useState('Birthday gift')
+  const [bankDescription, setBankDescription] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const isManager = activeMember.role === 'owner' || activeMember.role === 'manager'
@@ -49,7 +49,7 @@ export function CrewView({
     setBankAction('add')
     setBankCategory('gift')
     setBankAmount('')
-    setBankDescription('Birthday gift')
+    setBankDescription('')
     setError('')
     setModal('bank')
   }
@@ -75,17 +75,28 @@ export function CrewView({
     setError('')
     const amountCents = Math.round(Number(bankAmount) * 100)
     if (!bankMemberId || !Number.isFinite(amountCents) || amountCents < 0 || (bankAction !== 'correct' && amountCents === 0)) return
+    const description = bankDescription.trim() || (
+      bankAction === 'correct'
+        ? 'Balance correction'
+        : bankAction === 'spend'
+          ? 'Purchase'
+          : bankCategory === 'gift'
+            ? 'Gift'
+            : bankCategory === 'allowance'
+              ? 'Allowance'
+              : 'Money added'
+    )
     setSaving(true)
     try {
       if (bankAction === 'correct') {
-        await onSetBankBalance({ memberId: bankMemberId, targetCents: amountCents, description: bankDescription.trim() })
+        await onSetBankBalance({ memberId: bankMemberId, targetCents: amountCents, description })
       } else {
         await onRecordBankTransaction({
           memberId: bankMemberId,
           direction: bankAction === 'add' ? 'deposit' : 'withdrawal',
           category: bankAction === 'add' ? bankCategory : 'purchase',
           amountCents,
-          description: bankDescription.trim(),
+          description,
         })
       }
       setModal(null)
@@ -229,7 +240,7 @@ export function CrewView({
                   const action = event.target.value as 'add' | 'spend' | 'correct'
                   setBankAction(action)
                   setBankAmount(action === 'correct' ? ((snapshot.balances[bankMemberId] ?? 0) / 100).toFixed(2) : '')
-                  setBankDescription(action === 'add' ? 'Birthday gift' : action === 'spend' ? 'Store purchase' : 'Balance correction')
+                  setBankDescription('')
                 }}>
                   <option value="add">Add money</option>
                   <option value="spend">Record a purchase</option>
@@ -246,7 +257,15 @@ export function CrewView({
                 </label>
               )}
               <label>{bankAction === 'correct' ? 'New balance' : 'Amount'}<input value={bankAmount} onChange={(event) => setBankAmount(event.target.value)} inputMode="decimal" min="0" step="0.01" required /></label>
-              <label>Note<input value={bankDescription} onChange={(event) => setBankDescription(event.target.value)} maxLength={160} required /></label>
+              <label>
+                <span className={styles.optionalLabel}>Note <small>Optional</small></span>
+                <input
+                  value={bankDescription}
+                  onChange={(event) => setBankDescription(event.target.value)}
+                  placeholder={bankAction === 'correct' ? 'Why the balance changed' : bankAction === 'spend' ? 'What they bought' : bankCategory === 'gift' ? 'Birthday, holiday, or who it came from' : 'Any helpful details'}
+                  maxLength={160}
+                />
+              </label>
               {bankAction === 'correct' && <p className={styles.bankHint}>Task Tin will add a correction for the difference. Earlier activity stays visible.</p>}
               {error && <p className={styles.modalError} role="alert">{error}</p>}
               <button disabled={saving}>{saving ? 'Saving…' : bankAction === 'add' ? 'Add to bank' : bankAction === 'spend' ? 'Record purchase' : 'Correct balance'}</button>
