@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['mark.svg', 'pwa-192.png', 'pwa-512.png'],
       manifest: {
-        name: 'Task Tin',
-        short_name: 'Task Tin',
-        description: 'Good work. Real rewards.',
+        name: 'Loot Jar',
+        short_name: 'Loot Jar',
+        description: 'Good work. Real loot.',
         theme_color: '#f7f3e8',
         background_color: '#f7f3e8',
         display: 'standalone',

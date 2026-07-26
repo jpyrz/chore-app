@@ -92,9 +92,9 @@ export function AppShell({
   return (
     <div className={styles.app}>
       <header className={styles.topbar}>
-        <NavLink to="/" className={styles.brand} aria-label="Task Tin home">
+        <NavLink to="/" className={styles.brand} aria-label="Loot Jar home">
           <img src="/mark.svg" alt="" />
-          <span>task tin</span>
+          <span>loot jar</span>
         </NavLink>
 
         <div className={styles.topbarActions}>

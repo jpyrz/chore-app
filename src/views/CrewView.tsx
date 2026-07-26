@@ -266,7 +266,7 @@ export function CrewView({
                   maxLength={160}
                 />
               </label>
-              {bankAction === 'correct' && <p className={styles.bankHint}>Task Tin will add a correction for the difference. Earlier activity stays visible.</p>}
+              {bankAction === 'correct' && <p className={styles.bankHint}>Loot Jar will add a correction for the difference. Earlier activity stays visible.</p>}
               {error && <p className={styles.modalError} role="alert">{error}</p>}
               <button disabled={saving}>{saving ? 'Saving…' : bankAction === 'add' ? 'Add to bank' : bankAction === 'spend' ? 'Record purchase' : 'Correct balance'}</button>
             </form>

@@ -2,7 +2,7 @@
 
 ## Product
 
-- Product: Task Tin, a shared job board and family money ledger where people complete useful work and track what they can save or spend.
+- Product: Loot Jar, a shared job board and family money ledger where people complete useful work and track what they can save or spend.
 - Primary user loop: A manager publishes work, a member claims and finishes it, a manager approves it, and the ledger records the earning.
 - Launch model: Invite-only beta.
 - Mobile-first target: 360–430 px, followed by tablet and desktop adaptations.

@@ -1,1 +1,1 @@
--- Task Tin intentionally starts empty. Test data belongs in automated test transactions.
+-- Loot Jar intentionally starts empty. Test data belongs in automated test transactions.

@@ -1,4 +1,4 @@
-describe('Task Tin authentication', () => {
+describe('Loot Jar authentication', () => {
   it('offers real account creation and recovery', () => {
     cy.visit('/')
     cy.contains('Ready when you are.').should('be.visible')
