@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import {
   approveRealChore,
+  archiveRealChore,
   claimRealChore,
   completeRealChore,
   createCrew,
@@ -113,6 +114,7 @@ export function useRealCrew(crewId: string | undefined, activeMemberId: string |
   const complete = useCrewMutation<string>(queryKey, (choreId) => completeRealChore(choreId, activeMemberId!))
   const approve = useCrewMutation<string>(queryKey, approveRealChore)
   const add = useCrewMutation<NewChoreInput>(queryKey, (input) => createRealChore(crewId!, input))
+  const archive = useCrewMutation<string>(queryKey, archiveRealChore)
   const addManaged = useCrewMutation<ManagedProfileInput>(queryKey, (input) => createManagedProfile(crewId!, input))
   const goal = useCrewMutation<{ name: string; targetCents: number }>(queryKey, (input) =>
     setSavingsGoal(crewId!, activeMemberId!, input.name, input.targetCents),
@@ -139,6 +141,7 @@ export function useRealCrew(crewId: string | undefined, activeMemberId: string |
     completeChore: complete.mutateAsync,
     approveChore: approve.mutateAsync,
     addChore: add.mutateAsync,
+    archiveChore: archive.mutateAsync,
     addManagedProfile: addManaged.mutateAsync,
     updateGoal: goal.mutateAsync,
     recordBankTransaction: bankTransaction.mutateAsync,
@@ -150,7 +153,7 @@ export function useRealCrew(crewId: string | undefined, activeMemberId: string |
     markAllNotificationsRead: markAllRead.mutateAsync,
     verifyManagedProfilePin,
     isSaving:
-      claim.isPending || unclaim.isPending || complete.isPending || approve.isPending || add.isPending || addManaged.isPending || goal.isPending || bankTransaction.isPending || bankBalance.isPending || updateRole.isPending || removeMember.isPending,
-    mutationError: claim.error ?? unclaim.error ?? complete.error ?? approve.error ?? add.error ?? addManaged.error ?? goal.error ?? bankTransaction.error ?? bankBalance.error ?? updateRole.error ?? removeMember.error,
+      claim.isPending || unclaim.isPending || complete.isPending || approve.isPending || add.isPending || archive.isPending || addManaged.isPending || goal.isPending || bankTransaction.isPending || bankBalance.isPending || updateRole.isPending || removeMember.isPending,
+    mutationError: claim.error ?? unclaim.error ?? complete.error ?? approve.error ?? add.error ?? archive.error ?? addManaged.error ?? goal.error ?? bankTransaction.error ?? bankBalance.error ?? updateRole.error ?? removeMember.error,
   }
 }

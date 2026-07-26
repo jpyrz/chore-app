@@ -1,9 +1,10 @@
-import { ArrowRight, CheckCircle2, Flame, Plus, Sparkles } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Flame, ListTodo, Plus, Sparkles } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { AddChoreModal } from '../components/AddChoreModal'
 import { Avatar } from '../components/Avatar'
 import { ChoreCard } from '../components/ChoreCard'
+import { ManageJobsModal } from '../components/ManageJobsModal'
 import type { CrewSnapshot, Member, NewChoreInput } from '../types/domain'
 import { formatMoney, getOnTheWayTotal } from '../utils/money'
 import styles from './views.module.scss'
@@ -16,6 +17,7 @@ interface HomeViewProps {
   onComplete: (choreId: string) => void
   onApprove: (choreId: string) => void
   onAddChore: (input: NewChoreInput) => void
+  onArchiveChore: (templateId: string) => Promise<unknown>
 }
 
 export function HomeView({
@@ -26,8 +28,10 @@ export function HomeView({
   onComplete,
   onApprove,
   onAddChore,
+  onArchiveChore,
 }: HomeViewProps) {
   const [addingChore, setAddingChore] = useState(false)
+  const [managingJobs, setManagingJobs] = useState(false)
   const isManager = activeMember.role === 'owner' || activeMember.role === 'manager'
   const available = snapshot.chores.filter((chore) => chore.status === 'available')
   const mine = snapshot.chores.filter(
@@ -140,15 +144,20 @@ export function HomeView({
       )}
 
       <section className={styles.section}>
-        <div className={styles.sectionHeading}>
+        <div className={`${styles.sectionHeading} ${styles.jobsHeading}`}>
           <div>
             <span className={styles.eyebrow}>Up for grabs</span>
             <h2>Pick your next win</h2>
           </div>
           {isManager && (
-            <button className={styles.addButton} onClick={() => setAddingChore(true)}>
-              <Plus size={17} /> Add a job
-            </button>
+            <div className={styles.jobButtons}>
+              <button className={styles.manageButton} onClick={() => setManagingJobs(true)}>
+                <ListTodo size={16} /> Manage
+              </button>
+              <button className={styles.addButton} onClick={() => setAddingChore(true)}>
+                <Plus size={17} /> Add a job
+              </button>
+            </div>
           )}
         </div>
         <div className={styles.cardGrid}>
@@ -181,6 +190,14 @@ export function HomeView({
           members={snapshot.members}
           onClose={() => setAddingChore(false)}
           onAdd={onAddChore}
+        />
+      )}
+      {managingJobs && (
+        <ManageJobsModal
+          jobs={snapshot.jobTemplates}
+          members={snapshot.members}
+          onClose={() => setManagingJobs(false)}
+          onArchive={onArchiveChore}
         />
       )}
     </div>

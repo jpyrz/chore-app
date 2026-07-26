@@ -35,6 +35,16 @@ const snapshot: CrewSnapshot = {
       assigneeId: 'mia',
     },
   ],
+  jobTemplates: [
+    {
+      id: 'template-1',
+      title: 'Feed the dogs',
+      category: 'pets',
+      rewardCents: 200,
+      cadence: 'Daily',
+      currentStatus: 'available',
+    },
+  ],
   ledger: [
     { id: 'earning-1', memberId: 'mia', kind: 'earning', category: 'chore', amountCents: 800, description: 'Fold the laundry', createdAt: new Date().toISOString() },
   ],
@@ -72,6 +82,7 @@ describe('AppShell mobile navigation', () => {
             onComplete={cy.stub()}
             onApprove={cy.stub()}
             onAddChore={cy.stub()}
+            onArchiveChore={cy.stub().resolves()}
           />
         </AppShell>
       </MemoryRouter>,
@@ -81,5 +92,31 @@ describe('AppShell mobile navigation', () => {
       .should('have.css', 'bottom', '12px')
       .and('have.css', 'border-radius', '23px')
     cy.contains('nav a', 'Bank').should('be.visible')
+  })
+
+  it('keeps manager job controls usable on a narrow phone', () => {
+    cy.viewport(360, 800)
+    const activeMember = snapshot.members[0]
+
+    mount(
+      <MemoryRouter>
+        <HomeView
+          snapshot={snapshot}
+          activeMember={activeMember}
+          onClaim={cy.stub()}
+          onUnclaim={cy.stub()}
+          onComplete={cy.stub()}
+          onApprove={cy.stub()}
+          onAddChore={cy.stub()}
+          onArchiveChore={cy.stub().resolves()}
+        />
+      </MemoryRouter>,
+    )
+
+    cy.contains('button', 'Manage').should('be.visible').click()
+    cy.contains('[role="dialog"]', 'Manage jobs').should('be.visible')
+    cy.document().then((document) => {
+      expect(document.documentElement.scrollWidth).to.be.at.most(document.documentElement.clientWidth)
+    })
   })
 })

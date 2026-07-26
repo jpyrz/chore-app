@@ -13,6 +13,7 @@ import type {
   Member,
   MemberRole,
   NewChoreInput,
+  JobTemplate,
 } from '../types/domain'
 import { calculateStreak } from '../utils/streak'
 
@@ -48,6 +49,7 @@ interface MemberRow {
 
 interface ChoreRow {
   id: string
+  template_id: string | null
   title: string
   category: ChoreCategory
   reward_cents: number
@@ -59,6 +61,15 @@ interface ChoreRow {
   is_assigned: boolean
   instructions: string | null
   chore_templates: { cadence: string } | Array<{ cadence: string }> | null
+}
+
+interface ChoreTemplateRow {
+  id: string
+  title: string
+  category: ChoreCategory
+  reward_cents: number
+  cadence: string
+  assigned_member_id: string | null
 }
 
 interface LedgerRow {
@@ -142,7 +153,7 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
   const ensured = await api.rpc('ensure_due_occurrences', { p_crew_id: crewId })
   if (ensured.error) throw new Error(ensured.error.message)
 
-  const [crewResult, membersResult, choresResult, ledgerResult, balancesResult, goalsResult] = await Promise.all([
+  const [crewResult, membersResult, choresResult, templatesResult, ledgerResult, balancesResult, goalsResult] = await Promise.all([
     api.from('crews').select('id, name, invite_code').eq('id', crewId).single(),
     api
       .from('crew_members')
@@ -151,10 +162,16 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
       .order('joined_at'),
     api
       .from('chore_occurrences')
-      .select('id, title, category, reward_cents, due_at, status, assignee_id, claimed_at, claim_window_hours, is_assigned, instructions, chore_templates(cadence)')
+      .select('id, template_id, title, category, reward_cents, due_at, status, assignee_id, claimed_at, claim_window_hours, is_assigned, instructions, chore_templates(cadence)')
       .eq('crew_id', crewId)
       .in('status', ['available', 'claimed', 'review'])
       .order('due_at', { ascending: true, nullsFirst: false }),
+    api
+      .from('chore_templates')
+      .select('id, title, category, reward_cents, cadence, assigned_member_id')
+      .eq('crew_id', crewId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false }),
     api
       .from('ledger_entries')
       .select('id, member_id, kind, category, amount_cents, description, created_at')
@@ -200,6 +217,36 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
     }
   })
 
+  const templateRows = unwrap((templatesResult.data ?? []) as ChoreTemplateRow[], templatesResult.error)
+  const occurrencePriority: Record<ChoreRow['status'], number> = {
+    cancelled: 0,
+    available: 1,
+    review: 2,
+    claimed: 3,
+    completed: 0,
+  }
+  const openOccurrenceByTemplate = new Map<string, ChoreRow>()
+  for (const occurrence of choreRows) {
+    if (!occurrence.template_id) continue
+    const current = openOccurrenceByTemplate.get(occurrence.template_id)
+    if (!current || occurrencePriority[occurrence.status] > occurrencePriority[current.status]) {
+      openOccurrenceByTemplate.set(occurrence.template_id, occurrence)
+    }
+  }
+  const jobTemplates: JobTemplate[] = templateRows.map((template) => {
+    const occurrence = openOccurrenceByTemplate.get(template.id)
+    return {
+      id: template.id,
+      title: template.title,
+      category: template.category,
+      rewardCents: template.reward_cents,
+      cadence: cadenceLabels[template.cadence] ?? template.cadence,
+      assignedMemberId: template.assigned_member_id ?? undefined,
+      currentStatus: occurrence?.status === 'cancelled' ? undefined : occurrence?.status,
+      currentAssigneeId: occurrence?.assignee_id ?? undefined,
+    }
+  })
+
   const ledgerRows = unwrap((ledgerResult.data ?? []) as LedgerRow[], ledgerResult.error)
   const ledger: LedgerEntry[] = ledgerRows.map((row) => ({
     id: row.id,
@@ -236,6 +283,7 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
     activeMemberId: members[0]?.id ?? '',
     members,
     chores,
+    jobTemplates,
     ledger,
     balances,
     goals,
@@ -341,6 +389,13 @@ export async function createRealChore(crewId: string, input: NewChoreInput) {
     p_assigned_member_id: input.assignedMemberId ?? null,
     p_claim_window_hours: input.claimWindowHours,
     p_due_at: null,
+  })
+  if (error) throw new Error(error.message)
+}
+
+export async function archiveRealChore(templateId: string) {
+  const { error } = await client().rpc('archive_chore', {
+    p_template_id: templateId,
   })
   if (error) throw new Error(error.message)
 }

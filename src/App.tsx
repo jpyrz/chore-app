@@ -119,6 +119,7 @@ function SignedInApp({ authUserId }: { authUserId: string }) {
               onComplete={crew.completeChore}
               onApprove={crew.approveChore}
               onAddChore={crew.addChore}
+              onArchiveChore={crew.archiveChore}
             />
           }
         />

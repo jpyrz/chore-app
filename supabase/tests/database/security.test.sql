@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = extensions, public;
 
-select plan(33);
+select plan(36);
 
 select ok(
   (select relrowsecurity from pg_class where oid = 'public.ledger_entries'::regclass),
@@ -56,6 +56,18 @@ select ok(
     'EXECUTE'
   ),
   'authenticated managers can create configurable jobs through the checked function'
+);
+select ok(
+  to_regprocedure('public.archive_chore(uuid)') is not null,
+  'the manager-only job archive function exists'
+);
+select ok(
+  has_function_privilege('authenticated', 'public.archive_chore(uuid)', 'EXECUTE'),
+  'authenticated managers can call the checked job archive function'
+);
+select ok(
+  not has_table_privilege('authenticated', 'public.chore_templates', 'UPDATE'),
+  'browser users cannot archive job templates directly'
 );
 select ok(
   exists (

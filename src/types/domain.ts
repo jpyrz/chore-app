@@ -34,6 +34,17 @@ export interface Chore {
   instructions?: string
 }
 
+export interface JobTemplate {
+  id: string
+  title: string
+  category: ChoreCategory
+  rewardCents: number
+  cadence: string
+  assignedMemberId?: string
+  currentStatus?: ChoreStatus
+  currentAssigneeId?: string
+}
+
 export interface LedgerEntry {
   id: string
   memberId: string
@@ -73,6 +84,7 @@ export interface CrewSnapshot {
   activeMemberId: string
   members: Member[]
   chores: Chore[]
+  jobTemplates: JobTemplate[]
   ledger: LedgerEntry[]
   balances: Record<string, number>
   goals: Record<string, { name: string; targetCents: number }>

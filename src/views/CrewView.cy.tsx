@@ -12,6 +12,7 @@ const snapshot: CrewSnapshot = {
     { id: 'mia', name: 'Mia', initials: 'MI', role: 'member', color: '#ef745e', streak: 2, managedBy: 'james' },
   ],
   chores: [],
+  jobTemplates: [],
   ledger: [
     { id: 'earning-1', memberId: 'mia', kind: 'earning', category: 'chore', amountCents: 800, description: 'Test job', createdAt: '2026-07-22T12:00:00Z' },
   ],

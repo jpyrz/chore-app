@@ -14,6 +14,7 @@ const snapshot: CrewSnapshot = {
     { id: 'job-1', title: 'Feed the dogs', category: 'pets', rewardCents: 300, timing: 'Today', cadence: 'Daily', status: 'claimed', assigneeId: 'mia' },
     { id: 'job-2', title: 'Put away dishes', category: 'kitchen', rewardCents: 200, timing: 'Today', cadence: 'Daily', status: 'review', assigneeId: 'mia' },
   ],
+  jobTemplates: [],
   ledger: [
     { id: 'gift-1', memberId: 'mia', kind: 'adjustment', category: 'gift', amountCents: 2000, description: 'Birthday gift', createdAt: '2026-07-22T12:00:00Z' },
     { id: 'purchase-1', memberId: 'mia', kind: 'adjustment', category: 'purchase', amountCents: -500, description: 'Book', createdAt: '2026-07-22T13:00:00Z' },
