@@ -55,6 +55,8 @@ interface ChoreRow {
   status: 'available' | 'claimed' | 'review' | 'completed' | 'cancelled'
   assignee_id: string | null
   claimed_at: string | null
+  claim_window_hours: number | null
+  is_assigned: boolean
   instructions: string | null
   chore_templates: { cadence: string } | Array<{ cadence: string }> | null
 }
@@ -94,12 +96,14 @@ function relatedOne<T>(value: T | T[]): T {
   return Array.isArray(value) ? value[0] : value
 }
 
-function timingLabel(dueAt: string | null) {
-  if (!dueAt) return 'Anytime'
-  const due = new Date(dueAt)
-  const today = new Date()
-  const sameDay = due.toDateString() === today.toDateString()
-  if (sameDay) return 'Today'
+function timingLabel(row: ChoreRow) {
+  if (row.status === 'available') return 'Available now'
+  if (row.status === 'review') return 'Ready for approval'
+  if (row.is_assigned) return 'Assigned to you · No deadline'
+  if (row.status === 'claimed' && row.claim_window_hours === null) return 'No time limit'
+  if (!row.due_at) return 'Available anytime'
+
+  const due = new Date(row.due_at)
   return `Due ${new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(due)}`
 }
 
@@ -147,7 +151,7 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
       .order('joined_at'),
     api
       .from('chore_occurrences')
-      .select('id, title, category, reward_cents, due_at, status, assignee_id, claimed_at, instructions, chore_templates(cadence)')
+      .select('id, title, category, reward_cents, due_at, status, assignee_id, claimed_at, claim_window_hours, is_assigned, instructions, chore_templates(cadence)')
       .eq('crew_id', crewId)
       .in('status', ['available', 'claimed', 'review'])
       .order('due_at', { ascending: true, nullsFirst: false }),
@@ -184,13 +188,14 @@ export async function getCrewSnapshot(crewId: string): Promise<CrewSnapshot> {
       title: row.title,
       category: row.category,
       rewardCents: row.reward_cents,
-      timing: timingLabel(row.due_at),
+      timing: timingLabel(row),
       cadence: cadenceLabels[template?.cadence ?? 'one_time'] ?? 'One time',
       status: row.status === 'cancelled' ? 'completed' : row.status,
       assigneeId: row.assignee_id ?? undefined,
-      claimExpiresAt: row.claimed_at
-        ? new Date(new Date(row.claimed_at).getTime() + 24 * 60 * 60 * 1000).toISOString()
+      claimExpiresAt: row.claimed_at && row.claim_window_hours !== null
+        ? new Date(new Date(row.claimed_at).getTime() + row.claim_window_hours * 60 * 60 * 1000).toISOString()
         : undefined,
+      isAssigned: row.is_assigned,
       instructions: row.instructions ?? undefined,
     }
   })
@@ -333,6 +338,8 @@ export async function createRealChore(crewId: string, input: NewChoreInput) {
     p_reward_cents: input.rewardCents,
     p_cadence: cadence,
     p_instructions: input.instructions ?? null,
+    p_assigned_member_id: input.assignedMemberId ?? null,
+    p_claim_window_hours: input.claimWindowHours,
     p_due_at: null,
   })
   if (error) throw new Error(error.message)

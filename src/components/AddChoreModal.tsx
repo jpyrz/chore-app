@@ -1,30 +1,54 @@
 import { X } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import type { ChoreCategory, NewChoreInput } from '../types/domain'
+import type { ChoreCategory, Member, NewChoreInput } from '../types/domain'
 import styles from './AddChoreModal.module.scss'
 
 interface AddChoreModalProps {
+  members: Member[]
   onClose: () => void
   onAdd: (input: NewChoreInput) => void
 }
 
-export function AddChoreModal({ onClose, onAdd }: AddChoreModalProps) {
+type ClaimWindowChoice = '24' | '72' | '168' | 'none' | 'custom'
+
+export function AddChoreModal({ members, onClose, onAdd }: AddChoreModalProps) {
   const [title, setTitle] = useState('')
   const [reward, setReward] = useState('2.00')
   const [category, setCategory] = useState<ChoreCategory>('tidy')
   const [cadence, setCadence] = useState('One time')
   const [instructions, setInstructions] = useState('')
+  const [assignedMemberId, setAssignedMemberId] = useState('')
+  const [claimWindow, setClaimWindow] = useState<ClaimWindowChoice>('24')
+  const [customWindow, setCustomWindow] = useState('2')
+  const [customUnit, setCustomUnit] = useState<'hours' | 'days'>('days')
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
     const rewardCents = Math.round(Number(reward) * 100)
-    if (!title.trim() || !Number.isFinite(rewardCents) || rewardCents <= 0) return
+    const customHours = Math.round(Number(customWindow) * (customUnit === 'days' ? 24 : 1))
+    const claimWindowHours = assignedMemberId
+      ? null
+      : claimWindow === 'none'
+        ? null
+        : claimWindow === 'custom'
+          ? customHours
+          : Number(claimWindow)
+
+    if (
+      !title.trim()
+      || !Number.isFinite(rewardCents)
+      || rewardCents <= 0
+      || (claimWindowHours !== null && (!Number.isFinite(claimWindowHours) || claimWindowHours < 1 || claimWindowHours > 8760))
+    ) return
+
     onAdd({
       title: title.trim(),
       rewardCents,
       category,
       cadence,
       timing: 'Anytime today',
+      assignedMemberId: assignedMemberId || undefined,
+      claimWindowHours,
       instructions: instructions.trim() || undefined,
     })
     onClose()
@@ -82,6 +106,56 @@ export function AddChoreModal({ onClose, onAdd }: AddChoreModalProps) {
               <option value="other">Other</option>
             </select>
           </label>
+          <label>
+            Who can do this?
+            <select value={assignedMemberId} onChange={(event) => setAssignedMemberId(event.target.value)}>
+              <option value="">Anyone in the crew</option>
+              {members.map((member) => (
+                <option key={member.id} value={member.id}>{member.name}</option>
+              ))}
+            </select>
+          </label>
+          {assignedMemberId ? (
+            <p className={styles.fieldHint}>
+              This job will go straight into their lineup and stay there until it’s finished.
+            </p>
+          ) : (
+            <>
+              <label>
+                Time to finish after claiming
+                <select
+                  value={claimWindow}
+                  onChange={(event) => setClaimWindow(event.target.value as ClaimWindowChoice)}
+                >
+                  <option value="24">24 hours</option>
+                  <option value="72">3 days</option>
+                  <option value="168">1 week</option>
+                  <option value="none">No time limit</option>
+                  <option value="custom">Custom…</option>
+                </select>
+              </label>
+              {claimWindow === 'custom' && (
+                <div className={styles.customWindow}>
+                  <label>
+                    Amount
+                    <input
+                      inputMode="numeric"
+                      min="1"
+                      value={customWindow}
+                      onChange={(event) => setCustomWindow(event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Unit
+                    <select value={customUnit} onChange={(event) => setCustomUnit(event.target.value as 'hours' | 'days')}>
+                      <option value="hours">Hours</option>
+                      <option value="days">Days</option>
+                    </select>
+                  </label>
+                </div>
+              )}
+            </>
+          )}
           <label>
             Helpful details <small>Optional</small>
             <textarea

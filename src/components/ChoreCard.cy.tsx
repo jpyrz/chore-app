@@ -13,7 +13,7 @@ describe('ChoreCard', () => {
           title: 'Sweep the porch',
           category: 'outside',
           rewardCents: 400,
-          timing: 'Today',
+          timing: 'Available now',
           cadence: 'Weekly',
           status: 'available',
         }}
@@ -24,6 +24,8 @@ describe('ChoreCard', () => {
 
     cy.contains('Sweep the porch').should('be.visible')
     cy.contains('$4').should('be.visible')
+    cy.contains('Available now').should('be.visible')
+    cy.contains('Due').should('not.exist')
     cy.contains('button', 'I’ll do it').click()
     cy.get('@claim').should('have.been.calledOnce')
   })
@@ -55,5 +57,32 @@ describe('ChoreCard', () => {
     cy.contains('button', 'Unclaim').click()
     cy.get('@unclaim').should('have.been.calledOnce')
     cy.get('@finish').should('not.have.been.called')
+  })
+
+  it('keeps a directly assigned job in the member lineup without an unclaim action', () => {
+    const onFinish = cy.stub().as('finish')
+
+    mount(
+      <ChoreCard
+        chore={{
+          id: 'assigned-job',
+          title: 'Finish a chess game with Dad',
+          category: 'other',
+          rewardCents: 500,
+          timing: 'Assigned to you · No deadline',
+          cadence: 'One time',
+          status: 'claimed',
+          assigneeId: 'member-1',
+          isAssigned: true,
+        }}
+        mode="mine"
+        onAction={onFinish}
+      />,
+    )
+
+    cy.contains('Assigned to you · No deadline').should('be.visible')
+    cy.contains('button', 'Unclaim').should('not.exist')
+    cy.contains('button', 'Mark finished').click()
+    cy.get('@finish').should('have.been.calledOnce')
   })
 })

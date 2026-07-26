@@ -122,7 +122,7 @@ export function HomeView({
                 chore={chore}
                 mode="mine"
                 onAction={() => onComplete(chore.id)}
-                onSecondaryAction={() => onUnclaim(chore.id)}
+                onSecondaryAction={chore.isAssigned ? undefined : () => onUnclaim(chore.id)}
               />
             ))}
             {waiting.map((chore) => (
@@ -176,7 +176,13 @@ export function HomeView({
         )}
       </section>
 
-      {addingChore && <AddChoreModal onClose={() => setAddingChore(false)} onAdd={onAddChore} />}
+      {addingChore && (
+        <AddChoreModal
+          members={snapshot.members}
+          onClose={() => setAddingChore(false)}
+          onAdd={onAddChore}
+        />
+      )}
     </div>
   )
 }

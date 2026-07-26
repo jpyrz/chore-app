@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = extensions, public;
 
-select plan(28);
+select plan(33);
 
 select ok(
   (select relrowsecurity from pg_class where oid = 'public.ledger_entries'::regclass),
@@ -48,6 +48,44 @@ select ok(
 select ok(
   not has_function_privilege('authenticated', 'public.release_expired_claims(uuid)', 'EXECUTE'),
   'browser users cannot release claims directly'
+);
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.create_chore(uuid,text,text,integer,text,text,uuid,integer,timestamptz)',
+    'EXECUTE'
+  ),
+  'authenticated managers can create configurable jobs through the checked function'
+);
+select ok(
+  exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'chore_templates'
+      and column_name = 'assigned_member_id'
+  ),
+  'job templates can target a specific member'
+);
+select ok(
+  exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'chore_occurrences'
+      and column_name = 'claim_window_hours'
+  ),
+  'job occurrences snapshot their claim window'
+);
+select ok(
+  position(
+    'claim_window_hours' in pg_get_functiondef('public.release_expired_claims(uuid)'::regprocedure)
+  ) > 0,
+  'expired claims use the occurrence-specific claim window'
+);
+select ok(
+  position(
+    'not is_assigned' in pg_get_functiondef('public.release_expired_claims(uuid)'::regprocedure)
+  ) > 0,
+  'directly assigned jobs do not auto-release'
 );
 select ok(
   position(

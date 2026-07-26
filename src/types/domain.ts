@@ -30,6 +30,7 @@ export interface Chore {
   status: ChoreStatus
   assigneeId?: string
   claimExpiresAt?: string
+  isAssigned?: boolean
   instructions?: string
 }
 
@@ -102,6 +103,8 @@ export interface NewChoreInput {
   rewardCents: number
   timing: string
   cadence: string
+  assignedMemberId?: string
+  claimWindowHours: number | null
   instructions?: string
 }
 
