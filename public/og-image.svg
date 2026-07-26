@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f7f3e8"/>
+  <circle cx="1120" cy="548" r="170" fill="#dbe7da"/>
+  <circle cx="970" cy="660" r="210" fill="#f5c85d"/>
+  <circle cx="1075" cy="75" r="34" fill="#ef745e"/>
+
+  <g transform="translate(105 125) scale(2.95)">
+    <rect width="128" height="128" rx="34" fill="#173f35"/>
+    <path
+      d="M44 42h40v5.5c0 3.4 1.4 5.8 4.1 9.1 3.6 4.3 5.4 9.2 5.4 14.7V93c0 9.1-7.4 16.5-16.5 16.5H51c-9.1 0-16.5-7.4-16.5-16.5V71.3c0-5.5 1.8-10.4 5.4-14.7 2.7-3.3 4.1-5.7 4.1-9.1V42Z"
+      fill="#f7f3e8"
+    />
+    <rect x="41" y="25" width="46" height="16" rx="8" fill="#f7f3e8"/>
+    <rect x="44" y="43" width="40" height="4" rx="2" fill="#dcd3c0"/>
+    <rect x="51" y="58" width="26" height="10" rx="5" fill="#f5c85d"/>
+    <rect x="47" y="73" width="34" height="11" rx="5.5" fill="#ef745e"/>
+    <rect x="52" y="89" width="24" height="9" rx="4.5" fill="#e2d8c1"/>
+  </g>
+
+  <text
+    x="535"
+    y="272"
+    fill="#173f35"
+    font-family="Avenir Next, Arial Rounded MT Bold, Arial, sans-serif"
+    font-size="102"
+    font-weight="800"
+    letter-spacing="-4"
+  >Loot Jar</text>
+  <text
+    x="540"
+    y="352"
+    fill="#537168"
+    font-family="Avenir Next, Arial, sans-serif"
+    font-size="39"
+    font-weight="600"
+  >Good work. Real loot.</text>
+  <rect x="540" y="402" width="170" height="13" rx="6.5" fill="#f5c85d"/>
+  <rect x="721" y="402" width="90" height="13" rx="6.5" fill="#ef745e"/>
+</svg>

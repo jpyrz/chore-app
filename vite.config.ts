@@ -8,7 +8,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['mark.svg', 'pwa-192.png', 'pwa-512.png'],
+      includeAssets: [
+        'mark.svg',
+        'app-icon.svg',
+        'pwa-192.png',
+        'pwa-512.png',
+        'apple-touch-icon.png',
+      ],
       manifest: {
         name: 'Loot Jar',
         short_name: 'Loot Jar',
